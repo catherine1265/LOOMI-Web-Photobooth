@@ -1,0 +1,553 @@
+
+.colab-page {
+  --pt-burgundy: #652b2b;
+  --pt-cream: #fff5cb;
+  --pt-blue: rgba(202, 220, 230, 0.88);
+
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--pt-burgundy);
+  background-color: #f7f5ef;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 20px,
+      rgba(228, 155, 165, 0.22) 20px 26px,
+      rgba(255, 255, 255, 0.7) 26px 31px,
+      transparent 31px 42px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 20px,
+      rgba(228, 155, 165, 0.22) 20px 26px,
+      rgba(255, 255, 255, 0.7) 26px 31px,
+      transparent 31px 42px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 42px,
+      rgba(174, 215, 225, 0.23) 42px 50px,
+      transparent 50px 84px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 42px,
+      rgba(174, 215, 225, 0.23) 42px 50px,
+      transparent 50px 84px
+    );
+}
+
+/* Main layout */
+.colab-layout {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 41px 5% 40px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Same heading style as PhotoType */
+.colab-heading {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 80px;
+
+  display: flex;
+  justify-content: center;
+}
+
+.colab-heading span {
+  min-width: 320px;
+  height: 38px;
+  padding: 0 22px;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid #d6c68c;
+  border-radius: 999px;
+  background: #f8e9a8;
+  color: #806b45;
+
+  box-shadow:
+    0 2px 4px rgba(77, 48, 30, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+}
+
+/* Scalloped ticket */
+.colab__ticket {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  max-width: 1500px;
+  height: 540px;
+  box-sizing: border-box;
+  padding: 44px 50px 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colab__frame {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.colab__frame svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.colab__frame path {
+  fill: var(--pt-blue);
+  stroke: var(--pt-burgundy);
+  stroke-width: 1.5;
+  stroke-linejoin: miter;
+}
+
+/* Decorative sparkles */
+.colab__sparkle {
+  position: absolute;
+  z-index: 3;
+
+  width: 80px;
+  height: 80px;
+
+  pointer-events: none;
+  overflow: visible;
+}
+
+.colab__sparkle--left {
+  top: -23px;
+  left: -11px;
+  transform: rotate(7deg);
+}
+
+.colab__sparkle--right {
+  right: -27px;
+  bottom: -24px;
+  transform: rotate(12deg);
+}
+
+/* Two cards */
+.colab__panels {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  gap: 7%;
+}
+
+.colab__panel {
+  width: 100%;
+  max-width: 440px;
+  min-height: 405px;
+  box-sizing: border-box;
+  padding: 28px 34px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border: 1.5px solid var(--pt-burgundy);
+  border-radius: 16px;
+  background: var(--pt-cream);
+  box-shadow: 0 2px 3px rgba(70, 36, 30, 0.12);
+}
+
+/* Card title */
+.colab__panel-title {
+  margin: 0 0 28px;
+  color: var(--pt-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 1.8vw, 27px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+
+  text-shadow:
+    1px 1px 0 #fff5cb,
+    2px 2px 2px rgba(101, 43, 43, 0.28);
+}
+
+/* Form fields */
+.colab__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.colab__field {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.colab__field-label {
+  color: var(--pt-burgundy);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.colab__input-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.colab__input {
+  display: block;
+  width: 100%;
+  height: 35px;
+  box-sizing: border-box;
+  padding: 5px 38px 5px 13px;
+
+  border: 1px solid rgba(101, 43, 43, 0.9);
+  border-radius: 999px;
+  outline: none;
+
+  background: var(--pt-burgundy);
+  color: #fff4d4;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+}
+
+.colab__input::placeholder {
+  color: rgba(255, 244, 212, 0.65);
+}
+
+.colab__input:focus {
+  box-shadow: 0 0 0 3px rgba(101, 43, 43, 0.16);
+}
+
+/* Default pencil */
+.colab__edit-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+
+  width: 13px;
+  height: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #fff4d4;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.colab__edit-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Eye and clear buttons */
+.colab__field-action {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+
+  width: 27px;
+  height: 27px;
+  padding: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff4d4;
+
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.colab__field-action svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.colab__field-action:hover {
+  background: rgba(255, 244, 212, 0.15);
+}
+
+.colab__field-action:focus-visible {
+  outline: 2px solid #fff4d4;
+  outline-offset: 1px;
+}
+
+/* Create and Join buttons */
+.colab__submit {
+  align-self: center;
+
+  width: 150px;
+  min-height: 38px;
+  margin-top: 16px;
+  padding: 7px 20px;
+  box-sizing: border-box;
+
+  border: 1px solid #532020;
+  border-radius: 999px;
+  background: var(--pt-burgundy);
+  color: #fff4d4;
+
+  box-shadow: 0 2px 3px rgba(70, 36, 30, 0.18);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.colab__submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #7a302b;
+}
+
+.colab__submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.colab__submit:focus-visible,
+.colab__back:focus-visible {
+  outline: 3px solid #b99b56;
+  outline-offset: 4px;
+}
+
+/* Error and status messages */
+.colab__notice {
+  margin: 2px 0 0;
+  color: #8c2929;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* Created meeting details */
+.colab__created-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.colab__created-result p {
+  margin: 0;
+}
+
+.colab__created-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.colab__created-code {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.colab__invite {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+
+  border: 1px solid #b7a9a0;
+  border-radius: 6px;
+  background: #fffaf0;
+  color: var(--pt-burgundy);
+
+  font: inherit;
+  resize: vertical;
+}
+
+/* Back button */
+.colab__back {
+  margin-top: 24px;
+  padding: 8px 12px;
+
+  border: none;
+  background: transparent;
+  color: var(--pt-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.colab__back:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Tablet */
+@media (max-width: 760px) {
+  .colab-layout {
+    padding: 28px 4% 32px;
+  }
+
+  .colab-heading {
+    margin-bottom: 40px;
+  }
+
+  .colab-heading span {
+    min-width: 280px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .colab__ticket {
+    height: auto;
+    min-height: 460px;
+    padding: 40px 24px 32px;
+  }
+
+  .colab__panels {
+    gap: 18px;
+  }
+
+  .colab__panel {
+    min-height: 355px;
+    padding: 24px 18px;
+  }
+
+  .colab__panel-title {
+    font-size: 21px;
+    margin-bottom: 22px;
+  }
+
+  .colab__input {
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .colab__submit {
+    width: 125px;
+  }
+
+  .colab__sparkle {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .colab-layout {
+    padding: 28px 18px 30px;
+  }
+
+  .colab-heading {
+    margin-bottom: 28px;
+  }
+
+  .colab-heading span {
+    min-width: 0;
+    max-width: 100%;
+    height: 32px;
+    padding: 0 16px;
+    font-size: 11px;
+  }
+
+  .colab__ticket {
+    height: auto;
+    min-height: 0;
+    padding: 44px 18px;
+  }
+
+  .colab__panels {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .colab__panel {
+    max-width: 360px;
+    min-height: 300px;
+    padding: 26px 24px;
+  }
+
+  .colab__panel-title {
+    font-size: 23px;
+  }
+
+  .colab__input {
+    height: 36px;
+  }
+
+  .colab__submit {
+    width: 140px;
+    min-height: 38px;
+  }
+
+  .colab__sparkle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .colab__sparkle--left {
+    top: -18px;
+    left: -8px;
+  }
+
+  .colab__sparkle--right {
+    right: -20px;
+    bottom: -18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .colab__submit {
+    transition: none;
+  }
+}

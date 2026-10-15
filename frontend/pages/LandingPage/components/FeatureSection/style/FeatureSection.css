@@ -1,0 +1,337 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Judson:wght@400;700&display=swap");
+
+
+.feature-section {
+  --u: calc(min(100vw, 1500px) / 938);
+  --shift: 26;
+
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  height: calc((640 + var(--shift)) * var(--u));
+  margin: 0;
+
+  box-sizing: border-box;
+  overflow: hidden;
+
+  background-color: #fff8f0;
+  background-image: url("/images/Background.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.feature-section *,
+.feature-section *::before,
+.feature-section *::after {
+  box-sizing: border-box;
+}
+
+/* kanvas tempat semua elemen diletakkan */
+.feature-stage {
+  position: absolute;
+  top: calc(var(--shift) * var(--u));
+  left: 50%;
+  width: calc(938 * var(--u));
+  height: calc(640 * var(--u));
+  transform: translateX(-50%);
+}
+
+/* TIRAI SCALLOP DI ATAS */
+
+.feature-curtain {
+  position: absolute;
+  z-index: 5;
+  top: -1px;
+  left: 0;
+
+  width: 100%;
+  height: calc(46 * var(--u));
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='57' height='46' viewBox='0 0 57 46'%3E%3Cpath d='M0 0H57V28A28.5 17 0 0 1 0 28Z' fill='%23fdf3ec'/%3E%3Cpath d='M57 28A28.5 17 0 0 1 0 28' fill='none' stroke='%2395665f' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: calc(57 * var(--u)) calc(46 * var(--u));
+  background-position: calc(14 * var(--u)) 0;
+
+  filter: drop-shadow(0 calc(2 * var(--u)) calc(2 * var(--u)) #55302a40);
+  pointer-events: none;
+}
+
+/* garis merah di tepi atas tirai */
+.feature-curtain::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: calc(3 * var(--u));
+  background: #672629;
+}
+
+/* TALI */
+
+.feature-string {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+
+  width: calc(938 * var(--u));
+  height: calc(300 * var(--u));
+  overflow: visible;
+
+  pointer-events: none;
+}
+
+/* JUDUL (Poppins, maroon, garis tepi putih) */
+
+.feature-title {
+  --h1: calc(3 * var(--u));
+  --h2: calc(2.1 * var(--u));
+  --h3: calc(2.8 * var(--u));
+  --h4: calc(1.1 * var(--u));
+
+  position: absolute;
+  z-index: 4;
+  top: calc(90.5 * var(--u));
+  left: calc(453.5 * var(--u));
+
+  margin: 0;
+  padding-left: 0.13em;
+  transform: translateX(-50%);
+
+  color: #5f1f22;
+  font-family: "Poppins", sans-serif;
+  font-size: calc(31 * var(--u));
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.13em;
+  white-space: nowrap;
+
+  text-shadow:
+    var(--h1) 0 0 #fcdbe0,
+    calc(-1 * var(--h1)) 0 0 #fcdbe0,
+    0 var(--h1) 0 #fcdbe0,
+    0 calc(-1 * var(--h1)) 0 #fcdbe0,
+    var(--h2) var(--h2) 0 #fcdbe0,
+    calc(-1 * var(--h2)) var(--h2) 0 #fcdbe0,
+    var(--h2) calc(-1 * var(--h2)) 0 #fcdbe0,
+    calc(-1 * var(--h2)) calc(-1 * var(--h2)) 0 #fcdbe0,
+    var(--h3) var(--h4) 0 #fcdbe0,
+    calc(-1 * var(--h3)) var(--h4) 0 #fcdbe0,
+    var(--h3) calc(-1 * var(--h4)) 0 #fcdbe0,
+    calc(-1 * var(--h3)) calc(-1 * var(--h4)) 0 #fcdbe0,
+    var(--h4) var(--h3) 0 #fcdbe0,
+    calc(-1 * var(--h4)) var(--h3) 0 #fcdbe0,
+    var(--h4) calc(-1 * var(--h3)) 0 #fcdbe0,
+    calc(-1 * var(--h4)) calc(-1 * var(--h3)) 0 #fcdbe0,
+    0 calc(4 * var(--u)) calc(4 * var(--u)) #5c2828a0;
+}
+
+
+/* SPARKLE JUDUL */
+
+.feature-sparkle {
+  position: absolute;
+  z-index: 4;
+
+  width: calc(42 * var(--u));
+  height: calc(42 * var(--u));
+  overflow: visible;
+
+  pointer-events: none;
+}
+
+.sparkle-left {
+  top: calc(64 * var(--u));
+  left: calc(281 * var(--u));
+  transform: rotate(0deg);
+}
+
+.sparkle-right {
+  top: calc(108 * var(--u));
+  left: calc(596 * var(--u));
+  transform: rotate(0deg);
+}
+
+/* FRAME */
+
+.feature-frame {
+  position: absolute;
+  z-index: 2;
+
+  top: calc(var(--y) * var(--u));
+  left: calc(var(--x) * var(--u));
+
+  width: calc(173 * var(--u));
+  height: calc(210 * var(--u));
+
+  transform: translate(-50%, -50%) rotate(calc(var(--r) * 1deg));
+}
+
+/* scallop biru di sekeliling frame */
+.frame-scallop {
+  position: absolute;
+  z-index: 0;
+  top: calc(-12 * var(--u));
+  left: calc(-12 * var(--u));
+
+  width: calc(197 * var(--u));
+  height: calc(234 * var(--u));
+  overflow: visible;
+
+  filter: drop-shadow(0 calc(2 * var(--u)) calc(2 * var(--u)) #4627252e);
+  pointer-events: none;
+}
+
+/* badan frame pink */
+.frame-body {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+
+  border: calc(1.4 * var(--u)) solid #8b5a55;
+  border-radius: calc(5 * var(--u));
+  background: #fcdbe0;
+
+  box-shadow:
+    inset 0 0 0 calc(2 * var(--u)) #fdeeea,
+    0 calc(2 * var(--u)) calc(3 * var(--u)) #46272540;
+}
+
+/* jendela foto putih */
+.frame-photo {
+  position: absolute;
+  z-index: 2;
+  top: calc(14 * var(--u));
+  left: calc(13 * var(--u));
+
+  width: calc(147 * var(--u));
+  height: calc(147 * var(--u));
+
+  border-radius: calc(3 * var(--u));
+  background: #fffefd;
+
+  box-shadow:
+    inset 0 calc(3 * var(--u)) calc(4 * var(--u)) #46282833,
+    inset 0 0 0 calc(1.5 * var(--u)) #f8e4e6;
+}
+
+/* tombol */
+.frame-button {
+  position: absolute;
+  z-index: 3;
+  top: calc(167 * var(--u));
+  left: 50%;
+
+  min-width: calc(131 * var(--u));
+  height: calc(24 * var(--u));
+  padding: 0 calc(14 * var(--u));
+
+  border: none;
+  border-radius: 999px;
+  background: #682326;
+  color: #fff8f0;
+
+  font-family: "Judson", Georgia, serif;
+  font-size: calc(14.5 * var(--u));
+  font-weight: 400;
+  letter-spacing: calc(0.9 * var(--u));
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transform: translateX(-50%);
+
+  box-shadow: 0 calc(1 * var(--u)) calc(2 * var(--u)) #4020204d;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.frame-button:hover {
+  background: #8a393b;
+  transform: translate(-50%, -2px);
+}
+
+.frame-button:active {
+  transform: translateX(-50%);
+}
+
+.frame-button:focus-visible {
+  outline: 2px solid #682326;
+  outline-offset: 4px;
+}
+
+/* JEPITAN */
+
+.frame-clip {
+  position: absolute;
+  z-index: 4;
+  top: calc((var(--cy) - 48) * var(--u));
+  left: calc((var(--cx) - 30) * var(--u));
+
+  width: calc(60 * var(--u));
+  height: calc(80 * var(--u));
+  overflow: visible;
+
+  filter: drop-shadow(calc(1 * var(--u)) calc(2 * var(--u)) calc(1.5 * var(--u)) #44252533);
+  pointer-events: none;
+}
+
+/* MOBILE: frame disusun ke bawah */
+
+@media (max-width: 600px) {
+  .feature-section {
+    --u: calc(100vw / 400);
+
+    height: auto;
+    padding-bottom: calc(70 * var(--u));
+  }
+
+  .feature-stage {
+    position: relative;
+    top: auto;
+    left: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(80 * var(--u));
+
+    width: 100%;
+    height: auto;
+    padding-top: calc(200 * var(--u));
+    transform: none;
+  }
+
+  .feature-string {
+    display: none;
+  }
+
+  .feature-title {
+    top: calc(82 * var(--u));
+    left: 50%;
+    font-size: calc(28 * var(--u));
+  }
+
+  .sparkle-left {
+    top: calc(66 * var(--u));
+    left: calc(50% - 172 * var(--u));
+  }
+
+  .sparkle-right {
+    top: calc(92 * var(--u));
+    left: calc(50% + 132 * var(--u));
+  }
+
+  .feature-frame {
+    position: relative;
+    top: auto;
+    left: auto;
+    flex: none;
+    transform: rotate(calc(var(--r) * 1deg));
+  }
+}

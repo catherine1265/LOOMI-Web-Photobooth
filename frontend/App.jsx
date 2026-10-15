@@ -1,45 +1,127 @@
-// Entry point. Frontend files:
-//   App.jsx        · routing, home screen (create / join), start
-//   RoomScreen.jsx · room page: header, preview canvas, layer panel
-//   compositor.js  · background removal (MediaPipe) + canvas drawing, all in the browser
-//   roomClient.js  · API calls, session storage, LiveKit camera/audio, room state
-//   ui.jsx         · navigation + shared UI pieces
+
+import LandingPage from "./pages/LandingPage/LandingPage";
+import PhotoType from "./pages/PhotoType/PhotoType";
+import ColabPhoto from "./pages/PhotoType/components/ColabPhoto/ColabPhoto";
+import SelfPhoto from "./pages/PhotoType/components/SelfPhoto/SelfPhoto";
+
 import { StrictMode, useEffect, useId, useState } from "react";
 import { createRoot } from "react-dom/client";
+
 import { NAME_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "../lib/config.js";
 import { RoomScreen } from "./RoomScreen.jsx";
-import { createMeeting, joinMeeting, loadSession, saveSession } from "./roomClient.js";
+import {
+  createMeeting,
+  joinMeeting,
+  loadSession,
+  saveSession,
+} from "./roomClient.js";
+
 import { CopyButton, inputClass, navigate, primaryButton } from "./ui.jsx";
 import "./index.css";
 
+
 function App() {
   const [path, setPath] = useState(window.location.pathname);
+  const [search, setSearch] = useState(window.location.search);
+
   useEffect(() => {
-    const onPop = () => setPath(window.location.pathname);
+    const onPop = () => {
+      setPath(window.location.pathname);
+      setSearch(window.location.search);
+    };
+
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   const match = /^\/room\/([^/]+)\/?$/.exec(path);
   const code = match ? decodeURIComponent(match[1]) : null;
-  useEffect(() => {
-    document.title = code ? `Meeting ${code} · Venture Creation` : "Venture Creation";
-  }, [code]);
 
-  return code ? <RoomScreen key={code} code={code} /> : <HomeScreen />;
+  const isLandingPage =
+    (path === "/" || path === "") &&
+    !new URLSearchParams(search).has("join");
+
+  const isPhotoType = path === "/photo-type";
+  const isSelfPhoto = path === "/self-photo";
+  const isColabPhoto = path === "/colab-photo";
+
+  function navigateInternal(nextPath) {
+    window.history.pushState({}, "", nextPath);
+    setPath(nextPath);
+    setSearch("");
+  }
+
+  useEffect(() => {
+    document.title = code
+      ? `Meeting ${code} · LOOMI`
+      : isLandingPage
+        ? "LOOMI — Make Memories Together"
+        : isSelfPhoto
+          ? "LOOMI — Self Photo"
+          : isColabPhoto
+            ? "LOOMI — Colab Photo"
+            : isPhotoType
+              ? "LOOMI — Choose Photo Type"
+              : "LOOMI";
+  }, [code, isLandingPage, isPhotoType, isSelfPhoto, isColabPhoto]);
+
+  if (code) {
+    return <RoomScreen key={code} code={code} />;
+  }
+if (isLandingPage) {
+    return (
+      <LandingPage
+        onGetStarted={() => navigateInternal("/photo-type")}
+        onSelfPhoto={() => navigateInternal("/self-photo")}
+        onColabPhoto={() => navigateInternal("/colab-photo")}
+      />
+    );
+  }
+
+
+  if (isSelfPhoto) {
+    return (
+      <SelfPhoto
+        onBack={() => navigateInternal("/photo-type")}
+      />
+    );
+  }
+
+  if (isColabPhoto) {
+    return (
+      <ColabPhoto
+        onBack={() => navigateInternal("/photo-type")}
+      />
+    );
+  }
+
+  if (isPhotoType) {
+    return (
+      <PhotoType
+        onSelfPhoto={() => navigateInternal("/self-photo")}
+        onColabPhoto={() => navigateInternal("/colab-photo")}
+      />
+    );
+  }
+
+  return <HomeScreen />;
 }
 
-// ---- Home screen (create / join) -------------------------------------------------------
+
+// ---- Home screen (create / join) ----
 
 function Field({ label, hint, children }) {
   const id = useId();
   const hintId = hint ? `${id}-hint` : undefined;
+
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="block text-sm font-medium">
         {label}
       </label>
+
       {children(id, hintId)}
+
       {hint && (
         <p id={hintId} className="text-xs text-slate-500 dark:text-slate-400">
           {hint}
@@ -77,11 +159,14 @@ function HomeScreen() {
   async function onCreate(e) {
     e.preventDefault();
     setError(null);
+
     if (password.length < PASSWORD_MIN_LENGTH) {
       setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
       return;
     }
+
     setBusy(true);
+
     try {
       const session = await createMeeting({ name, password });
       saveSession(session);
@@ -97,7 +182,9 @@ function HomeScreen() {
     e.preventDefault();
     setError(null);
     setBusy(true);
+
     const cleanCode = code.replace(/\s+/g, "");
+
     try {
       const previous = loadSession(cleanCode);
       const session = await joinMeeting({
@@ -107,6 +194,7 @@ function HomeScreen() {
         identity: previous?.identity,
         rejoinKey: previous?.rejoinKey,
       });
+
       saveSession(session);
       navigate(`/room/${session.code}`);
     } catch (err) {
@@ -117,20 +205,28 @@ function HomeScreen() {
 
   if (created) {
     const invite = `Meeting code: ${created.session.code}, password: ${created.password}`;
+
     return (
       <HomeShell>
         <section aria-labelledby="created-title" className="space-y-5">
           <h2 id="created-title" className="text-lg font-semibold">
             Meeting created
           </h2>
+
           <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Meeting code</p>
-            <p className="font-mono text-4xl font-bold tracking-[0.2em]">{created.session.code}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Meeting code
+            </p>
+            <p className="font-mono text-4xl font-bold tracking-[0.2em]">
+              {created.session.code}
+            </p>
           </div>
+
           <div className="space-y-2">
             <label htmlFor="invite" className="block text-sm font-medium">
               Invite text
             </label>
+
             <textarea
               id="invite"
               readOnly
@@ -139,12 +235,20 @@ function HomeScreen() {
               className={`${inputClass} resize-none font-mono text-sm`}
               onFocus={(e) => e.currentTarget.select()}
             />
+
             <CopyButton text={invite} label="Copy invite" />
+
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Share it privately. The password is not shown again once you leave this page.
+              Share it privately. The password is not shown again once you
+              leave this page.
             </p>
           </div>
-          <button type="button" className={primaryButton} onClick={() => navigate(`/room/${created.session.code}`)}>
+
+          <button
+            type="button"
+            className={primaryButton}
+            onClick={() => navigate(`/room/${created.session.code}`)}
+          >
             Enter room
           </button>
         </section>
@@ -154,7 +258,11 @@ function HomeScreen() {
 
   return (
     <HomeShell>
-      <div role="tablist" aria-label="Meeting action" className="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+      <div
+        role="tablist"
+        aria-label="Meeting action"
+        className="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800"
+      >
         {["create", "join"].map((m) => (
           <button
             key={m}
@@ -195,12 +303,15 @@ function HomeScreen() {
                 pattern="[0-9 ]*"
                 placeholder="123456"
                 value={code}
-                onChange={(e) => setCode(e.target.value.replace(/[^\d ]/g, ""))}
+                onChange={(e) =>
+                  setCode(e.target.value.replace(/[^\d ]/g, ""))
+                }
                 className={`${inputClass} font-mono tracking-widest`}
               />
             )}
           </Field>
         )}
+
         <Field label="Your display name">
           {(id) => (
             <input
@@ -215,9 +326,14 @@ function HomeScreen() {
             />
           )}
         </Field>
+
         <Field
           label={mode === "create" ? "Choose a password" : "Password"}
-          hint={mode === "create" ? `At least ${PASSWORD_MIN_LENGTH} characters.` : undefined}
+          hint={
+            mode === "create"
+              ? `At least ${PASSWORD_MIN_LENGTH} characters.`
+              : undefined
+          }
         >
           {(id, hintId) => (
             <div className="relative">
@@ -225,14 +341,19 @@ function HomeScreen() {
                 id={id}
                 name="password"
                 type={showPassword ? "text" : "password"}
-                autoComplete={mode === "create" ? "new-password" : "current-password"}
+                autoComplete={
+                  mode === "create" ? "new-password" : "current-password"
+                }
                 required
-                minLength={mode === "create" ? PASSWORD_MIN_LENGTH : undefined}
+                minLength={
+                  mode === "create" ? PASSWORD_MIN_LENGTH : undefined
+                }
                 aria-describedby={hintId}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`${inputClass} pr-20`}
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
@@ -244,13 +365,22 @@ function HomeScreen() {
             </div>
           )}
         </Field>
+
         {error && (
-          <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+          <p
+            role="alert"
+            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300"
+          >
             {error}
           </p>
         )}
+
         <button type="submit" disabled={busy} className={primaryButton}>
-          {busy ? "Please wait…" : mode === "create" ? "Create meeting" : "Join meeting"}
+          {busy
+            ? "Please wait…"
+            : mode === "create"
+              ? "Create meeting"
+              : "Join meeting"}
         </button>
       </form>
     </HomeShell>
@@ -263,9 +393,10 @@ function HomeShell({ children }) {
       <header className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Venture Creation</h1>
         <p className="mt-2 text-slate-600 dark:text-slate-400">
-          A photobooth video room: everyone&apos;s camera, layered into one picture.
+          A photobooth video room: everyone's camera, layered into one picture.
         </p>
       </header>
+
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         {children}
       </div>
@@ -273,7 +404,7 @@ function HomeShell({ children }) {
   );
 }
 
-// ---- Start ------------------------------------------------------------------------------
+// ---- Start ----
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -1,0 +1,256 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Judson:wght@400;700&family=La+Belle+Aurore&display=swap");
+
+/* BASE */
+
+.landing-page {
+  min-height: 100vh;
+  color: #652b2b;
+  background: #fffdfa;
+  font-family: "DM Sans", sans-serif;
+}
+
+.landing-page * {
+  box-sizing: border-box;
+}
+
+/* HERO BACKGROUND */
+
+.reference-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 3%;
+  width: 100%;
+  min-height: calc(100vh - 61px);
+  padding: 30px 5% 45px;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 100% 8%,
+      #f7efb8 0,
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 100% 100%,
+      #fde8eb 0,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 0 70%,
+      #e2edf2 0,
+      transparent 43%
+    ),
+    #fffefa;
+}
+
+
+
+.reference-art {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 550px;                       /* <-- ukuran booth */
+  justify-self: center;
+  overflow: visible;
+  transform: translate(-6%, -2.5vw);      /* geser ke kiri & naik sedikit */
+}
+
+.photobooth-image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+}
+
+
+
+.photo-strip {
+  position: absolute;
+  display: block;
+  max-width: none;
+  height: auto;
+  transform-origin: 0 0;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 4px #573c3228);
+}
+
+/* pink: di depan, miring ke kiri */
+.photo-strip-pink {
+  top: 52.4%;
+  left: 70.9%;
+  z-index: 3;
+  width: 23.2%;
+  transform: rotate(-7deg);
+}
+
+/* kuning: di belakang pink, miring ke kanan */
+.photo-strip-yellow {
+  top: 52.5%;
+  left: 96.1%;
+  z-index: 2;
+  width: 17.4%;
+  transform: rotate(7deg);
+}
+
+/* SPARKLES */
+
+.hero-sparkle {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* kuning: pojok kiri atas booth (ukuran & posisi ikut booth) */
+.sparkle-yellow {
+  top: -2%;
+  left: -2%;
+  z-index: 4;
+  width: 12.5%;
+  height: auto;
+}
+
+/* merah: menempel di ujung "wherever you are." */
+.sparkle-red {
+  top: 0.95em;
+  left: 100%;
+  width: 1.1em;
+  height: 1.1em;
+  margin-left: -0.1em;
+  transform: rotate(8deg);
+}
+
+/* RIGHT: HEADING */
+
+.reference-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  max-width: 520px;
+  padding: 0 10px;
+  text-align: center;
+}
+
+.reference-copy h1 {
+  width: 100%;
+  margin: 0 0 96px;
+  color: #702727;
+  font-family: "La Belle Aurore", cursive;
+  font-size: clamp(38px, 4vw, 52px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 1px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.hero-line-1 {
+  display: block;
+}
+
+.hero-line-2 {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin-left: 2.6em;
+}
+
+/* DESCRIPTION */
+
+.reference-copy p {
+  width: 100%;
+  max-width: 470px;
+  margin: 0 0 84px;
+  color: #793c3a;
+  font-family: "Judson", Georgia, serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 2.3;
+  letter-spacing: 1.1px;
+}
+
+/* CTA BUTTON */
+
+.reference-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 292px;
+  min-height: 42px;
+  padding: 8px 24px;
+  border: none;
+  border-radius: 999px;
+  background: #672525;
+  box-shadow: 0 3px 4px #4a202044;
+  color: #fffaf4;
+  font-family: "Judson", Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.reference-button:hover {
+  transform: translateY(-2px);
+  background: #843838;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 760px) {
+  .reference-hero {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    min-height: auto;
+    padding: 35px 22px 55px;
+  }
+
+  .reference-art {
+    width: 100%;
+    max-width: 600px;
+    transform: none;
+  }
+
+  .photobooth-image {
+    max-width: 100%;
+  }
+
+  .reference-copy h1 {
+    margin-bottom: 40px;
+    font-size: 42px;
+    text-align: center;
+  }
+
+  .hero-line-2 {
+    margin: 0 auto;
+  }
+
+  .sparkle-red {
+    width: 0.9em;
+    height: 0.9em;
+  }
+
+  .reference-copy p {
+    margin-bottom: 32px;
+    font-size: 12px;
+    line-height: 2;
+  }
+
+  .reference-button {
+    min-width: 240px;
+    min-height: 40px;
+    font-size: 17px;
+  }
+}

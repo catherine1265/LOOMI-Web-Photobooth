@@ -1,0 +1,648 @@
+
+.self-photo-page {
+  --self-burgundy: #652b2b;
+  --self-cream: #fff5cb;
+  --self-blue: #cbdce5;
+
+  min-height: 100vh;
+  color: var(--self-burgundy);
+  background-color: #fffdf8;
+
+  background-image:
+    radial-gradient(
+      ellipse at 96% 8%,
+      rgba(255, 240, 171, 0.76) 0%,
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 78% 88%,
+      rgba(255, 204, 219, 0.68) 0%,
+      transparent 42%
+    ),
+    radial-gradient(
+      ellipse at 2% 88%,
+      rgba(202, 225, 235, 0.72) 0%,
+      transparent 40%
+    ),
+    linear-gradient(
+      110deg,
+      #edf5f7 0%,
+      #fffdf8 52%,
+      #fff8e9 100%
+    );
+
+  overflow-x: hidden;
+}
+
+/* Main layout */
+.self-photo-layout {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 64px 3% 40px;
+}
+
+/* Camera and results layout */
+.self-photo-stage {
+  position: relative;
+
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: minmax(0, 740px) 230px;
+  column-gap: 210px;
+  align-items: start;
+}
+
+/* Left camera section */
+.self-photo-left {
+  width: 100%;
+  min-width: 0;
+}
+
+.self-photo-camera-card {
+  position: relative;
+
+  width: 100%;
+  box-sizing: border-box;
+  padding: 22px 27px 15px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  border: 1.3px solid var(--self-burgundy);
+  border-radius: 29px;
+  background: rgba(202, 220, 230, 0.96);
+
+  box-shadow: 0 2px 3px rgba(70, 36, 30, 0.2);
+}
+
+/* Camera preview */
+.self-photo-camera-viewport {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 1.3;
+  overflow: hidden;
+
+  border-radius: 12px;
+  background: #6d252b;
+}
+
+.self-photo-video,
+.self-photo-upload-preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.self-photo-video {
+  transform: scaleX(-1);
+}
+
+.self-photo-video--hidden {
+  display: none;
+}
+
+.self-photo-upload-preview {
+  position: absolute;
+  inset: 0;
+}
+
+/* Camera loading and error messages */
+.self-photo-camera-message {
+  position: absolute;
+  inset: 0;
+  padding: 24px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  background: #652b2b;
+  color: #fff4d4;
+  text-align: center;
+}
+
+.self-photo-camera-message p {
+  max-width: 520px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.self-photo-spinner {
+  width: 34px;
+  height: 34px;
+
+  border: 3px solid rgba(255, 244, 212, 0.3);
+  border-top-color: #fff4d4;
+  border-radius: 50%;
+
+  animation: self-photo-spin 0.8s linear infinite;
+}
+
+@keyframes self-photo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Camera shutter */
+.self-photo-shutter {
+  width: 54px;
+  height: 54px;
+  margin-top: 9px;
+  padding: 14px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(101, 43, 43, 0.08);
+  border-radius: 50%;
+  background: #fff9ed;
+  color: var(--self-burgundy);
+
+  box-shadow: 0 1px 3px rgba(70, 36, 30, 0.12);
+  cursor: pointer;
+}
+
+.self-photo-shutter svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.self-photo-shutter:hover:not(:disabled) {
+  background: #f8e9a8;
+}
+
+.self-photo-shutter:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Decorative sparkles */
+.self-photo__sparkle {
+  position: absolute;
+  z-index: 2;
+
+  width: 105px;
+  height: 105px;
+
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Pink sparkle at top-left */
+.self-photo__sparkle--camera {
+  top: -43px;
+  left: -21px;
+
+  width: 105px;
+  height: 105px;
+
+  transform: rotate(7deg);
+}
+
+.self-photo__sparkle--camera path {
+  fill: #f2a8b9;
+}
+
+/* Bottom-right sparkle */
+.self-photo__sparkle--camera-bottom {
+  right: -39px;
+  bottom: -22px;
+
+  width: 110px;
+  height: 110px;
+
+  transform: rotate(12deg);
+}
+
+/* Take a Photo / Upload Photo */
+.self-photo-actions {
+  width: 100%;
+  height: 48px;
+  margin-top: 20px;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+
+  border: 1.5px solid var(--self-burgundy);
+  border-radius: 999px;
+  background: #fff9ed;
+
+  box-shadow: 0 2px 3px rgba(70, 36, 30, 0.18);
+}
+
+.self-photo-action {
+  min-width: 0;
+  padding: 8px 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: transparent;
+  color: var(--self-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.self-photo-action + .self-photo-action {
+  border-left: 1.5px solid var(--self-burgundy);
+}
+
+.self-photo-action:hover:not(:disabled) {
+  background: #f8e9a8;
+}
+
+.self-photo-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.self-photo-file-input {
+  display: none;
+}
+
+/* Right results panel */
+.self-photo-results {
+  position: relative;
+
+  width: 230px;
+  min-height: 610px;
+  margin-top: 7px;
+  padding: 32px 16px;
+  box-sizing: border-box;
+
+  border: 1.3px solid #897b7b;
+  background: rgba(202, 220, 230, 0.96);
+
+  box-shadow: 0 2px 3px rgba(70, 36, 30, 0.2);
+}
+
+.self-photo-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Result thumbnails */
+.self-photo__result-image {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 1.2;
+  overflow: hidden;
+
+  border-radius: 14px;
+  background: #d2d2cc;
+}
+
+.self-photo__result-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  filter: blur(8px);
+  transform: scale(1.08);
+}
+
+/* Blurred placeholder */
+.self-photo__mosaic {
+  width: 100%;
+  height: 100%;
+
+  background-color: #c5c5c0;
+  background-image:
+    linear-gradient(
+      45deg,
+      rgba(120, 120, 120, 0.55) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(120, 120, 120, 0.55) 75%
+    ),
+    linear-gradient(
+      45deg,
+      rgba(245, 245, 245, 0.85) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(245, 245, 245, 0.85) 75%
+    );
+
+  background-position: 0 0, 7px 7px;
+  background-size: 14px 14px;
+
+  filter: blur(5px);
+  transform: scale(1.06);
+}
+
+.self-photo__mosaic--2 {
+  background-position: 5px 2px, 12px 9px;
+}
+
+.self-photo__mosaic--3 {
+  background-position: 2px 5px, 9px 12px;
+}
+
+.self-photo__result-overlay {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+  background: rgba(255, 245, 203, 0.04);
+}
+
+/* Retake button */
+.self-photo-retake {
+  position: absolute;
+  top: 26px;
+  left: calc(100% + 54px);
+
+  width: 85px;
+  height: 85px;
+  padding: 16px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #a8b6bd;
+  border-radius: 50%;
+  background: rgba(202, 220, 230, 0.96);
+  color: #74413c;
+
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.self-photo-retake svg {
+  width: 100%;
+  height: 100%;
+}
+
+.self-photo-retake:hover {
+  transform: rotate(-15deg);
+  background: #e0ebed;
+}
+
+/* Done button */
+.self-photo-done {
+  position: absolute;
+  right: -175px;
+  bottom: 0;
+
+  min-width: 145px;
+  height: 46px;
+  padding: 8px 20px;
+
+  border: 1px solid #a98484;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--self-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+
+  cursor: pointer;
+}
+
+.self-photo-done:hover {
+  background: #f8e9a8;
+}
+
+/* Back button */
+.self-photo-back {
+  position: absolute;
+  right: -160px;
+  bottom: -43px;
+
+  padding: 7px 10px;
+
+  border: none;
+  background: transparent;
+  color: var(--self-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.self-photo-error,
+.self-photo-done-message {
+  margin: 12px 0 0;
+  color: #a3262e;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.self-photo-done-message {
+  max-width: 1000px;
+  margin: 16px auto 0;
+  padding: 0 12px;
+  text-align: center;
+}
+
+.self-photo-canvas {
+  display: none;
+}
+
+.self-photo-button {
+  min-height: 35px;
+  padding: 8px 14px;
+
+  border: 1px solid #fff4d4;
+  border-radius: 999px;
+  background: var(--self-burgundy);
+  color: #fff4d4;
+
+  cursor: pointer;
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .self-photo-layout {
+    padding: 48px 28px 35px;
+  }
+
+  .self-photo-stage {
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr) 190px;
+    column-gap: 100px;
+  }
+
+  .self-photo-camera-card {
+    padding: 20px 22px 14px;
+    border-radius: 25px;
+  }
+
+  .self-photo-results {
+    width: 190px;
+    min-height: 500px;
+    padding: 25px 13px;
+  }
+
+  .self-photo-results-list {
+    gap: 18px;
+  }
+
+  .self-photo-retake {
+    top: 12px;
+    left: calc(100% + 22px);
+    width: 65px;
+    height: 65px;
+    padding: 12px;
+  }
+
+  .self-photo-done {
+    right: -110px;
+    min-width: 100px;
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .self-photo-back {
+    right: -100px;
+  }
+
+  .self-photo__sparkle--camera,
+  .self-photo__sparkle--camera-bottom {
+    width: 80px;
+    height: 80px;
+  }
+
+  .self-photo-action {
+    font-size: 16px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+  .self-photo-layout {
+    padding: 30px 18px 35px;
+  }
+
+  .self-photo-stage {
+    max-width: 480px;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 35px;
+  }
+
+  .self-photo-camera-card {
+    padding: 16px 18px 12px;
+    border-radius: 22px;
+  }
+
+  .self-photo-camera-viewport {
+    aspect-ratio: 1.2;
+  }
+
+  .self-photo-shutter {
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+  }
+
+  .self-photo-actions {
+    height: 42px;
+    margin-top: 15px;
+  }
+
+  .self-photo-action {
+    padding: 6px;
+    font-size: 12px;
+    letter-spacing: 0.2px;
+  }
+
+  .self-photo-results {
+    width: 100%;
+    min-height: 0;
+    margin-top: 0;
+    padding: 14px;
+  }
+
+  .self-photo-results-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .self-photo-retake {
+    top: -56px;
+    left: auto;
+    right: 0;
+    width: 42px;
+    height: 42px;
+    padding: 8px;
+  }
+
+  .self-photo-done {
+    position: static;
+    display: block;
+    min-width: 105px;
+    height: 36px;
+    margin: 15px 0 0 auto;
+    font-size: 13px;
+  }
+
+  .self-photo-back {
+    position: static;
+    display: block;
+    margin: 8px 0 0 auto;
+  }
+
+  .self-photo__sparkle--camera {
+    top: -28px;
+    left: -10px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .self-photo__sparkle--camera-bottom {
+    right: -19px;
+    bottom: -12px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .self-photo-done-message {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .self-photo-spinner {
+    animation: none;
+  }
+
+  .self-photo-retake,
+  .self-photo-shutter {
+    transition: none;
+  }
+}

@@ -1,0 +1,93 @@
+
+.layout-section {
+  padding: 90px 7%;
+  background: #fff0f4;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.layout-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #f2dce3;
+  border-radius: 16px;
+  background: #fffaf8;
+  color: #3c2931;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.layout-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px #a45d7318;
+}
+
+.layout-preview {
+  display: grid;
+  min-height: 180px;
+  gap: 5px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #f8dce5;
+}
+
+.layout-count-1 {
+  grid-template-columns: 1fr;
+}
+
+.layout-count-2 {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.layout-count-3 {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.layout-count-4 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.layout-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  background: #fffaf5;
+  color: #d76c8b;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+}
+
+.layout-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.layout-count-label {
+  color: #806c74;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .layout-section {
+    padding: 65px 22px;
+  }
+
+  .layout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
