@@ -1,0 +1,448 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap");
+
+
+.frame-collection {
+  --u: calc(min(100vw, 1500px) / 938);
+  --shift: 26;
+
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  height: calc((640 + var(--shift)) * var(--u));
+  margin: 0;
+
+  box-sizing: border-box;
+  overflow: hidden;
+
+  /* Background pastel terang, tanpa gambar */
+  background-color: #fffdf8;
+  background-image:
+    radial-gradient(
+      ellipse at 100% 0%,
+      #fff5c4 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse at 0% 45%,
+      #f9dfe3 0%,
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 0% 100%,
+      #e5f0f3 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      115deg,
+      #fffdf9 0%,
+      #ffffff 55%,
+      #fffaf3 100%
+    );
+
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.frame-collection *,
+.frame-collection *::before,
+.frame-collection *::after {
+  box-sizing: border-box;
+}
+
+.collection-curtain {
+  position: absolute;
+  z-index: 5;
+  top: -1px;
+  left: 0;
+
+  width: 100%;
+  height: calc(46 * var(--u));
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='57' height='46' viewBox='0 0 57 46'%3E%3Cpath d='M0 0H57V28A28.5 17 0 0 1 0 28Z' fill='%23fdf3ec'/%3E%3Cpath d='M57 28A28.5 17 0 0 1 0 28' fill='none' stroke='%2395665f' stroke-width='1.4'/%3E%3C/svg%3E");
+
+  background-repeat: repeat-x;
+  background-size: calc(57 * var(--u)) calc(46 * var(--u));
+  background-position: calc(14 * var(--u)) 0;
+
+  filter: drop-shadow(
+    0 calc(2 * var(--u)) calc(2 * var(--u)) #55302a40
+  );
+
+  pointer-events: none;
+}
+
+.collection-curtain::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: calc(1.4 * var(--u));
+
+  background: #95665f;
+}
+
+
+
+.collection-stage {
+  position: absolute;
+  top: calc(var(--shift) * var(--u));
+  left: 50%;
+
+  width: calc(938 * var(--u));
+  height: calc(640 * var(--u));
+
+  transform: translateX(-50%);
+}
+
+
+/* pembungkus judul + sparkle (posisi sama seperti judul di FeatureSection) */
+.collection-heading {
+  position: absolute;
+  z-index: 4;
+
+  top: calc(90.5 * var(--u));
+  left: calc(453.5 * var(--u));
+
+  transform: translateX(-50%);
+}
+
+.collection-title {
+  --h1: calc(3 * var(--u));
+  --h2: calc(2.1 * var(--u));
+  --h3: calc(2.8 * var(--u));
+  --h4: calc(1.1 * var(--u));
+
+  position: relative;
+
+  margin: 0;
+  padding-left: 0.13em;
+
+  color: #ffb3c5;
+
+  font-family: "Poppins", sans-serif;
+  font-size: calc(31 * var(--u));
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.13em;
+  white-space: nowrap;
+
+  text-shadow:
+    var(--h1) 0 0 #fff0c9,
+    calc(-1 * var(--h1)) 0 0 #fff0c9,
+    0 var(--h1) 0 #fff0c9,
+    0 calc(-1 * var(--h1)) 0 #fff0c9,
+    var(--h2) var(--h2) 0 #fff0c9,
+    calc(-1 * var(--h2)) var(--h2) 0 #fff0c9,
+    var(--h2) calc(-1 * var(--h2)) 0 #fff0c9,
+    calc(-1 * var(--h2)) calc(-1 * var(--h2)) 0 #fff0c9,
+    var(--h3) var(--h4) 0 #fff0c9,
+    calc(-1 * var(--h3)) var(--h4) 0 #fff0c9,
+    var(--h3) calc(-1 * var(--h4)) 0 #fff0c9,
+    calc(-1 * var(--h3)) calc(-1 * var(--h4)) 0 #fff0c9,
+    var(--h4) var(--h3) 0 #fff0c9,
+    calc(-1 * var(--h4)) var(--h3) 0 #fff0c9,
+    var(--h4) calc(-1 * var(--h3)) 0 #fff0c9,
+    calc(-1 * var(--h4)) calc(-1 * var(--h3)) 0 #fff0c9,
+    0 calc(4 * var(--u)) calc(4 * var(--u)) #5c2828a0;
+}
+
+
+
+.collection-sparkle {
+  position: absolute;
+
+  width: calc(42 * var(--u));
+  height: calc(42 * var(--u));
+
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* kiri: pojok kiri atas judul */
+.collection-sparkle-left {
+  top: calc(-26.5 * var(--u));
+  left: calc(-24 * var(--u));
+
+  transform: rotate(-12deg);
+}
+
+/* kanan: pojok kanan bawah judul */
+.collection-sparkle-right {
+  top: calc(17.5 * var(--u));
+  left: calc(100% - 6 * var(--u));
+
+  transform: rotate(25deg);
+}
+
+
+
+.collection-grid {
+  position: absolute;
+  top: calc(222 * var(--u));
+  left: calc(99 * var(--u));
+
+  display: grid;
+  grid-template-columns: repeat(4, calc(139 * var(--u)));
+  grid-auto-rows: calc(125 * var(--u));
+
+  column-gap: calc(49 * var(--u));
+  row-gap: calc(67 * var(--u));
+
+  align-items: start;
+}
+
+
+.collection-frame {
+  --folder-color: #c6b49e;
+  --folder-fill: #f2e8d9;
+
+  position: relative;
+  display: block;
+
+  width: calc(139 * var(--u));
+  height: calc(125 * var(--u));
+
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+  text-align: left;
+  appearance: none;
+
+  transition: transform 0.2s ease;
+}
+
+.collection-frame:hover {
+  transform: translateY(calc(-3 * var(--u)));
+}
+
+.collection-frame:focus-visible {
+  outline: calc(2 * var(--u)) solid #682326;
+  outline-offset: calc(4 * var(--u));
+  border-radius: calc(8 * var(--u));
+}
+
+/* WARNA POLOS */
+
+.collection-frame.beige {
+  --folder-color: #c6b49e;
+  --folder-fill: #f2e8d9;
+}
+
+.collection-frame.pink {
+  --folder-color: #d9c5c7;
+  --folder-fill: #f5dfe3;
+}
+
+.collection-frame.blue {
+  --folder-color: #536879;
+  --folder-fill: #c5d4df;
+}
+
+.collection-frame.peach {
+  --folder-color: #e9b49b;
+  --folder-fill: #f8dfce;
+}
+
+.collection-frame.yellow {
+  --folder-color: #d8cf83;
+  --folder-fill: #fbf0bd;
+}
+
+/* TAB FOLDER */
+
+.folder-tab {
+  position: absolute;
+  z-index: 0;
+
+  top: 0;
+  left: 0;
+
+  width: calc(58 * var(--u));
+  height: calc(20 * var(--u));
+
+  background: var(--folder-color);
+
+  border: calc(1 * var(--u)) solid #8b5a55;
+  border-bottom: none;
+
+  border-radius:
+    calc(7 * var(--u))
+    calc(7 * var(--u))
+    0 0;
+
+  clip-path: polygon(
+    0 0,
+    64% 0,
+    84% 48%,
+    100% 100%,
+    0 100%
+  );
+}
+
+/* BADAN FOLDER */
+
+.folder-body {
+  position: absolute;
+  z-index: 1;
+
+  top: calc(10 * var(--u));
+  left: 0;
+
+  display: block;
+
+  width: 100%;
+  height: calc(100 * var(--u));
+
+  overflow: hidden;
+
+  border: calc(1 * var(--u)) solid #95665f;
+
+  border-radius:
+    calc(7 * var(--u))
+    calc(9 * var(--u))
+    calc(13 * var(--u))
+    calc(13 * var(--u));
+
+  background: var(--folder-fill);
+
+  box-shadow:
+    inset 0 calc(3 * var(--u)) calc(3 * var(--u)) #ffffffa0,
+    0 calc(2 * var(--u)) calc(2 * var(--u)) #55302a30;
+}
+
+/* ISI FOLDER POLOS */
+
+.folder-preview {
+  position: absolute;
+
+  top: calc(5 * var(--u));
+  right: calc(1 * var(--u));
+  bottom: calc(13 * var(--u));
+  left: calc(1 * var(--u));
+
+  display: block;
+  overflow: hidden;
+
+  border-radius:
+    calc(5 * var(--u))
+    calc(7 * var(--u))
+    calc(3 * var(--u))
+    calc(3 * var(--u));
+
+  background: var(--folder-fill);
+}
+
+/* PEGANGAN FOLDER */
+
+.folder-handle {
+  position: absolute;
+
+  left: 50%;
+  bottom: calc(5 * var(--u));
+
+  width: 58%;
+  height: calc(3 * var(--u));
+
+  transform: translateX(-50%);
+
+  border-radius: 999px;
+  background: #9b7166;
+
+  box-shadow: 0 calc(1 * var(--u)) 0 #f7ded7;
+}
+
+
+.collection-bottom-nav {
+  position: absolute;
+  z-index: 6;
+
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  height: calc(35 * var(--u));
+
+  background: #cbdbe5;
+  pointer-events: none;
+}
+
+
+
+@media (max-width: 600px) {
+  .frame-collection {
+    --u: calc(100vw / 400);
+
+    height: auto;
+    min-height: calc(860 * var(--u));
+    padding-bottom: calc(80 * var(--u));
+  }
+
+  .collection-stage {
+    position: relative;
+    top: auto;
+    left: auto;
+
+    width: 100%;
+    height: auto;
+    min-height: calc(800 * var(--u));
+
+    padding-top: calc(180 * var(--u));
+
+    transform: none;
+  }
+
+  .collection-heading {
+    top: calc(95 * var(--u));
+    left: 50%;
+  }
+
+  .collection-title {
+    font-size: calc(19 * var(--u));
+    letter-spacing: calc(1 * var(--u));
+  }
+
+  .collection-sparkle {
+    width: calc(30 * var(--u));
+    height: calc(30 * var(--u));
+  }
+
+  .collection-sparkle-left {
+    top: calc(-22 * var(--u));
+    left: calc(-24 * var(--u));
+  }
+
+  .collection-sparkle-right {
+    top: calc(8 * var(--u));
+    left: calc(100% - 6 * var(--u));
+  }
+
+  .collection-grid {
+    position: relative;
+    top: auto;
+    left: auto;
+
+    display: grid;
+    grid-template-columns: repeat(2, calc(139 * var(--u)));
+
+    justify-content: center;
+
+    column-gap: calc(35 * var(--u));
+    row-gap: calc(35 * var(--u));
+
+    margin: 0 auto;
+  }
+
+  .collection-frame {
+    width: calc(139 * var(--u));
+    height: calc(125 * var(--u));
+  }
+
+  .collection-bottom-nav {
+    height: calc(50 * var(--u));
+  }
+}

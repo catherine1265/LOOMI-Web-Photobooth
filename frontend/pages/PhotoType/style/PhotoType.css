@@ -1,0 +1,347 @@
+
+.photo-type-page {
+  --pt-burgundy: #652b2b;
+  --pt-cream: #fff5cb;
+  --pt-blue: rgba(202, 220, 230, 0.88);
+
+  min-height: 100vh;
+  overflow: hidden;
+  color: var(--pt-burgundy);
+  background-color: #f7f5ef;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 20px,
+      rgba(228, 155, 165, 0.22) 20px 26px,
+      rgba(255, 255, 255, 0.7) 26px 31px,
+      transparent 31px 42px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 20px,
+      rgba(228, 155, 165, 0.22) 20px 26px,
+      rgba(255, 255, 255, 0.7) 26px 31px,
+      transparent 31px 42px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 42px,
+      rgba(174, 215, 225, 0.23) 42px 50px,
+      transparent 50px 84px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 42px,
+      rgba(174, 215, 225, 0.23) 42px 50px,
+      transparent 50px 84px
+    );
+}
+
+/* Main layout */
+.photo-type {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 41px 5% 40px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Heading */
+.photo-type__heading {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 80px;
+
+  display: flex;
+  justify-content: center;
+}
+
+.photo-type__heading span {
+  min-width: 320px;
+  height: 38px;
+  padding: 0 22px;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid #d6c68c;
+  border-radius: 999px;
+  background: #f8e9a8;
+  color: #806b45;
+
+  box-shadow:
+    0 2px 4px rgba(77, 48, 30, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+}
+
+/* Blue ticket */
+.photo-type__ticket {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  max-width: 1500px;
+  height: 540px;
+  box-sizing: border-box;
+  padding: 44px 50px 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Scalloped ticket shape (SVG) */
+.photo-type__frame {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.photo-type__frame svg {
+  display: block;
+  overflow: visible;
+}
+
+.photo-type__frame path {
+  fill: var(--pt-blue);
+  stroke: var(--pt-burgundy);
+  stroke-width: 1.5;
+  stroke-linejoin: miter;
+}
+
+/* Three options */
+.photo-type__options {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  gap: 20px;
+}
+
+/* Clickable option */
+.photo-type__option {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 23px;
+
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Circular icons */
+.photo-type__icon {
+  width: 240px;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1.3px solid var(--pt-burgundy);
+  border-radius: 50%;
+  background: var(--pt-cream);
+
+  box-shadow: 0 2px 3px rgba(70, 36, 30, 0.22);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.photo-type__icon svg {
+  display: block;
+  flex: none;
+  width: 59.5%;
+  height: auto;
+  color: var(--pt-burgundy);
+  overflow: visible;
+}
+
+.photo-type__icon--colab svg {
+  width: 83.3%;
+}
+
+/* Option labels */
+.photo-type__label {
+  width: 100%;
+  max-width: 240px;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 5px 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: var(--pt-burgundy);
+  color: #fff4d4;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  white-space: nowrap;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+/* Hover effects */
+.photo-type__option:hover .photo-type__icon {
+  transform: translateY(-4px);
+  box-shadow: 0 7px 12px rgba(70, 36, 30, 0.2);
+  background-color: #fff8d8;
+}
+
+.photo-type__option:hover .photo-type__label {
+  transform: translateY(-2px);
+  background-color: #7a302b;
+}
+
+/* Keyboard focus */
+.photo-type__option:focus-visible {
+  outline: 3px solid #b99b56;
+  outline-offset: 8px;
+  border-radius: 12px;
+}
+
+/* Decorative stars */
+.photo-type__sparkle {
+  position: absolute;
+  z-index: 2;
+
+  width: 80px;
+  height: 80px;
+
+  pointer-events: none;
+  overflow: visible;
+}
+
+.photo-type__sparkle--left {
+  top: -23px;
+  left: -11px;
+  transform: rotate(7deg);
+}
+
+.photo-type__sparkle--right {
+  right: -27px;
+  bottom: -24px;
+  transform: rotate(12deg);
+}
+
+/* Tablet */
+@media (max-width: 760px) {
+  .photo-type__ticket {
+    height: 340px;
+    padding: 40px 24px 32px;
+  }
+
+  .photo-type__options {
+    gap: 14px;
+  }
+
+  .photo-type__icon {
+    width: clamp(100px, 19vw, 145px);
+  }
+
+  .photo-type__option {
+    gap: 16px;
+  }
+
+  .photo-type__label {
+    max-width: 150px;
+    padding-inline: 6px;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .photo-type {
+    padding: 28px 18px 30px;
+  }
+
+  .photo-type__heading {
+    margin-bottom: 26px;
+  }
+
+  .photo-type__heading span {
+    min-width: 0;
+    font-size: 11px;
+  }
+
+  .photo-type__ticket {
+    height: auto;
+    padding: 50px 18px;
+  }
+
+  .photo-type__options {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .photo-type__option {
+    gap: 14px;
+  }
+
+  .photo-type__icon {
+    width: 132px;
+  }
+
+  .photo-type__label {
+    max-width: 180px;
+    font-size: 15px;
+  }
+
+  .photo-type__sparkle {
+    width: 50px;
+    height: 50px;
+  }
+
+  .photo-type__sparkle--left {
+    top: -18px;
+    left: -8px;
+  }
+
+  .photo-type__sparkle--right {
+    right: -20px;
+    bottom: -18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-type__icon,
+  .photo-type__label {
+    transition: none;
+  }
+}
