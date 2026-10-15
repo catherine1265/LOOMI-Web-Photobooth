@@ -1,0 +1,30 @@
+{
+  "name": "venture-creation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Photobooth-style video room: everyone's camera overlaid into one image, with a host-controlled layer stack.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@mediapipe/tasks-vision": "^1.0.1",
+    "livekit-client": "^2.22.4",
+    "livekit-server-sdk": "^2.19.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.4"
+  }
+}
