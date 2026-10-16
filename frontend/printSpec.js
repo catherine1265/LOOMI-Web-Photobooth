@@ -1,51 +1,33 @@
-const STRIP = { width: 591, height: 1772 };
-const GRID = { width: 1181, height: 1772 };
-const POLAROID = { width: 1039, height: 1264 };
+const STRIP = { width: 591, card: { width: 103, height: 270 } };
+const GRID = { width: 1181, card: { width: 192, height: 270 } };
+const POLAROID = { width: 1039, card: { width: 138, height: 190 } };
 
-const PAD_X = 0.08;
-const PAD_Y = 0.05;
-const GAP = 63;
-
-function strip(rows) {
-  const padX = Math.round(STRIP.width * PAD_X);
-  const padY = Math.round(STRIP.height * PAD_Y);
+function build(base, columns, rows, cardGap, cardPad) {
+  const k = base.width / base.card.width;
   return {
-    ...STRIP,
-    columns: 1,
+    width: base.width,
+    height: Math.round(base.card.height * k),
+    columns,
     rows,
-    gap: GAP,
-    pad: { left: padX, right: padX, top: padY, bottom: padY },
+    gap: Math.round(cardGap * k),
+    pad: {
+      left: Math.round(cardPad.left * k),
+      right: Math.round(cardPad.right * k),
+      top: Math.round(cardPad.top * k),
+      bottom: Math.round(cardPad.bottom * k),
+    },
   };
 }
 
+const STRIP_PAD_X = STRIP.card.width * 0.08;
+const STRIP_PAD_Y = STRIP.card.height * 0.05;
+
 export const printSpec = {
-  "1x1": {
-    ...POLAROID,
-    columns: 1,
-    rows: 1,
-    gap: 0,
-    pad: {
-      left: Math.round(POLAROID.width * 0.05),
-      right: Math.round(POLAROID.width * 0.05),
-      top: Math.round(POLAROID.width * 0.05),
-      bottom: Math.round(POLAROID.height * 0.22),
-    },
-  },
-  "1x2": strip(2),
-  "1x3": strip(3),
-  "1x4": strip(4),
-  "2x2": {
-    ...GRID,
-    columns: 2,
-    rows: 2,
-    gap: GAP,
-    pad: {
-      left: Math.round(GRID.width * PAD_X),
-      right: Math.round(GRID.width * PAD_X),
-      top: Math.round(GRID.height * PAD_Y),
-      bottom: Math.round(GRID.height * PAD_Y),
-    },
-  },
+  "1x1": build(POLAROID, 1, 1, 0, { left: 16, right: 16, top: 16, bottom: 32 }),
+  "1x2": build(STRIP, 1, 2, 8, { left: STRIP_PAD_X, right: STRIP_PAD_X, top: 16, bottom: 16 }),
+  "1x3": build(STRIP, 1, 3, 11, { left: STRIP_PAD_X, right: STRIP_PAD_X, top: STRIP_PAD_Y, bottom: STRIP_PAD_Y }),
+  "1x4": build(STRIP, 1, 4, 11, { left: STRIP_PAD_X, right: STRIP_PAD_X, top: STRIP_PAD_Y, bottom: STRIP_PAD_Y }),
+  "2x2": build(GRID, 2, 2, 8, { left: 16, right: 16, top: 16, bottom: 16 }),
 };
 
 export function getSlotRects(spec) {

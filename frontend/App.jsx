@@ -5,6 +5,7 @@ import ColabPhoto from "./pages/PhotoType/components/ColabPhoto/ColabPhoto";
 import SelfPhoto from "./pages/PhotoType/components/SelfPhoto/SelfPhoto";
 import EditPage from "./pages/EditPage/EditPage";
 import FrameType from "./pages/PhotoType/components/FrameType/FrameType";
+import UploadPhoto from "./pages/PhotoType/components/UploadPhoto/UploadPhoto";
 
 import { StrictMode, useEffect, useId, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -50,6 +51,7 @@ function App() {
   const isColabPhoto = path === "/colab-photo";
   const isFrameType = path === "/frame-type";
   const isEdit = path === "/edit";
+  const isUploadPhoto = path === "/upload-photo";
 
   function chooseFrameThen(nextPath) {
     setAfterFrameType(nextPath);
@@ -71,14 +73,16 @@ function App() {
           ? "LOOMI — Self Photo"
           : isColabPhoto
             ? "LOOMI — Colab Photo"
-            : isEdit
+            : isUploadPhoto
+              ? "LOOMI — Upload Photo"
+              : isEdit
               ? "LOOMI — Edit Photo"
               : isFrameType
               ? "LOOMI — Choose Frame Type"
               : isPhotoType
                 ? "LOOMI — Choose Photo Type"
                 : "LOOMI";
-  }, [code, isLandingPage, isPhotoType, isFrameType, isEdit, isSelfPhoto, isColabPhoto]);
+  }, [code, isLandingPage, isPhotoType, isFrameType, isEdit, isUploadPhoto, isSelfPhoto, isColabPhoto]);
 
   if (code) {
     return <RoomScreen key={code} code={code} />;
@@ -109,6 +113,16 @@ if (isLandingPage) {
       <ColabPhoto
         onEnterRoom={(roomCode) => chooseFrameThen(`/room/${roomCode}`)}
         onBack={() => navigateInternal("/photo-type")}
+      />
+    );
+  }
+
+  if (isUploadPhoto) {
+    return (
+      <UploadPhoto
+        frameType={frameType}
+        onContinue={() => navigateInternal("/edit")}
+        onBack={() => chooseFrameThen("/upload-photo")}
       />
     );
   }
@@ -148,7 +162,7 @@ if (isLandingPage) {
       <PhotoType
         onSelfPhoto={() => chooseFrameThen("/self-photo")}
         onColabPhoto={() => navigateInternal("/colab-photo")}
-        onEditPhoto={() => chooseFrameThen(null)}
+        onEditPhoto={() => chooseFrameThen("/upload-photo")}
       />
     );
   }
