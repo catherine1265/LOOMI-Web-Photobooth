@@ -3,6 +3,8 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 import PhotoType from "./pages/PhotoType/PhotoType";
 import ColabPhoto from "./pages/PhotoType/components/ColabPhoto/ColabPhoto";
 import SelfPhoto from "./pages/PhotoType/components/SelfPhoto/SelfPhoto";
+import EditPage from "./pages/EditPage/EditPage";
+import FrameType from "./pages/PhotoType/components/FrameType/FrameType";
 
 import { StrictMode, useEffect, useId, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -23,6 +25,8 @@ import "./index.css";
 function App() {
   const [path, setPath] = useState(window.location.pathname);
   const [search, setSearch] = useState(window.location.search);
+  const [afterFrameType, setAfterFrameType] = useState(null);
+  const [frameType, setFrameType] = useState(null);
 
   useEffect(() => {
     const onPop = () => {
@@ -44,6 +48,13 @@ function App() {
   const isPhotoType = path === "/photo-type";
   const isSelfPhoto = path === "/self-photo";
   const isColabPhoto = path === "/colab-photo";
+  const isFrameType = path === "/frame-type";
+  const isEdit = path === "/edit";
+
+  function chooseFrameThen(nextPath) {
+    setAfterFrameType(nextPath);
+    navigateInternal("/frame-type");
+  }
 
   function navigateInternal(nextPath) {
     window.history.pushState({}, "", nextPath);
@@ -60,10 +71,14 @@ function App() {
           ? "LOOMI — Self Photo"
           : isColabPhoto
             ? "LOOMI — Colab Photo"
-            : isPhotoType
-              ? "LOOMI — Choose Photo Type"
-              : "LOOMI";
-  }, [code, isLandingPage, isPhotoType, isSelfPhoto, isColabPhoto]);
+            : isEdit
+              ? "LOOMI — Edit Photo"
+              : isFrameType
+              ? "LOOMI — Choose Frame Type"
+              : isPhotoType
+                ? "LOOMI — Choose Photo Type"
+                : "LOOMI";
+  }, [code, isLandingPage, isPhotoType, isFrameType, isEdit, isSelfPhoto, isColabPhoto]);
 
   if (code) {
     return <RoomScreen key={code} code={code} />;
@@ -82,6 +97,8 @@ if (isLandingPage) {
   if (isSelfPhoto) {
     return (
       <SelfPhoto
+        frameType={frameType}
+        onDone={() => navigateInternal("/edit")}
         onBack={() => navigateInternal("/photo-type")}
       />
     );
@@ -90,7 +107,38 @@ if (isLandingPage) {
   if (isColabPhoto) {
     return (
       <ColabPhoto
+        onEnterRoom={(roomCode) => chooseFrameThen(`/room/${roomCode}`)}
         onBack={() => navigateInternal("/photo-type")}
+      />
+    );
+  }
+
+  if (isEdit) {
+    return (
+      <EditPage
+        onEmpty={() => navigateInternal("/photo-type")}
+        onRetake={(id) => {
+          if (id) setFrameType(id);
+          navigateInternal("/self-photo");
+        }}
+      />
+    );
+  }
+
+  if (isFrameType) {
+    return (
+      <FrameType
+        onBack={() =>
+          navigateInternal(
+            afterFrameType?.startsWith("/room/")
+              ? "/colab-photo"
+              : "/photo-type"
+          )
+        }
+        onSelect={(id) => {
+          setFrameType(id);
+          navigateInternal(afterFrameType ?? "/self-photo");
+        }}
       />
     );
   }
@@ -98,8 +146,9 @@ if (isLandingPage) {
   if (isPhotoType) {
     return (
       <PhotoType
-        onSelfPhoto={() => navigateInternal("/self-photo")}
+        onSelfPhoto={() => chooseFrameThen("/self-photo")}
         onColabPhoto={() => navigateInternal("/colab-photo")}
+        onEditPhoto={() => chooseFrameThen(null)}
       />
     );
   }

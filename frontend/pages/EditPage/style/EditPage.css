@@ -1,0 +1,118 @@
+.edit-page {
+  --pt-burgundy: #652b2b;
+  --pt-cream: #fff5cb;
+
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--pt-burgundy);
+  background-color: #f7f5ef;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 20px,
+      rgba(228, 155, 165, 0.22) 20px 26px,
+      rgba(255, 255, 255, 0.7) 26px 31px,
+      transparent 31px 42px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 20px,
+      rgba(228, 155, 165, 0.22) 20px 26px,
+      rgba(255, 255, 255, 0.7) 26px 31px,
+      transparent 31px 42px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 42px,
+      rgba(174, 215, 225, 0.23) 42px 50px,
+      transparent 50px 84px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 42px,
+      rgba(174, 215, 225, 0.23) 42px 50px,
+      transparent 50px 84px
+    );
+}
+
+.edit-page__content {
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: clamp(16px, 3vh, 32px) 5%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2vh, 20px);
+}
+
+.edit-page__preview {
+  flex: 1;
+  min-height: 0;
+  max-width: 100%;
+
+  display: flex;
+  justify-content: center;
+}
+
+.edit-page__canvas {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+
+  box-shadow: 0 4px 10px rgba(70, 36, 30, 0.25);
+}
+
+.edit-page__actions {
+  flex: none;
+  display: flex;
+  gap: 16px;
+}
+
+.edit-page__button {
+  min-width: 140px;
+  height: 46px;
+  padding: 8px 20px;
+
+  border: 1px solid #a98484;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--pt-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+
+  cursor: pointer;
+}
+
+.edit-page__button:hover {
+  background: #f8e9a8;
+}
+
+.edit-page__button--primary {
+  background: var(--pt-burgundy);
+  border-color: var(--pt-burgundy);
+  color: #fff4d4;
+}
+
+.edit-page__button--primary:hover {
+  background: #7a302b;
+}
+
+.edit-page__button:focus-visible {
+  outline: 3px solid #b99b56;
+  outline-offset: 4px;
+}
+
+.edit-page__error {
+  margin: 0;
+  color: #a3262e;
+  font-size: 14px;
+}

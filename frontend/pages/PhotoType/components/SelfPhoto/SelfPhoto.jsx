@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import "./style/SelfPhoto.css";
 import Navbar from "../../../Navbar/tampilan/Navbar";
+import { photoTypes } from "../FrameType/FrameType";
+import { saveSoloSession } from "../../../../photoStore.js";
 
 function Sparkle({ className = "" }) {
   return (
@@ -60,7 +62,7 @@ function BlurredPlaceholder({ photo, index }) {
       {photo ? (
         <img
           src={photo}
-          alt={`Blurred photo result ${index + 1}`}
+          alt={`Photo result ${index + 1}`}
         />
       ) : (
         <div
@@ -75,7 +77,12 @@ function BlurredPlaceholder({ photo, index }) {
   );
 }
 
-export default function SelfPhoto({ onBack }) {
+export default function SelfPhoto({ onBack, onDone, frameType }) {
+  const frame =
+    photoTypes.find((type) => type.id === frameType) ??
+    photoTypes.find((type) => type.id === "1x3");
+  const slots = frame.slots;
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -83,7 +90,7 @@ export default function SelfPhoto({ onBack }) {
 
   const [cameraStatus, setCameraStatus] = useState("loading");
   const [cameraError, setCameraError] = useState("");
-  const [photo, setPhoto] = useState(null);
+  const [photos, setPhotos] = useState([]);
   const [doneMessage, setDoneMessage] = useState("");
   const [retryToken, setRetryToken] = useState(0);
 
@@ -191,7 +198,16 @@ export default function SelfPhoto({ onBack }) {
     context.scale(-1, 1);
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    setPhoto(canvas.toDataURL("image/jpeg", 0.92));
+    addPhoto(canvas.toDataURL("image/jpeg", 0.92));
+  }
+
+  function addPhoto(source) {
+    if (photos.length >= slots) {
+      setDoneMessage("The frame is full. Use retake to replace the last photo.");
+      return;
+    }
+
+    setPhotos((previous) => [...previous, source].slice(0, slots));
     setCameraError("");
     setDoneMessage("");
   }
@@ -210,9 +226,7 @@ export default function SelfPhoto({ onBack }) {
 
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        setPhoto(reader.result);
-        setCameraError("");
-        setDoneMessage("");
+        addPhoto(reader.result);
       }
     };
 
@@ -224,7 +238,7 @@ export default function SelfPhoto({ onBack }) {
   }
 
   function retakePhoto() {
-    setPhoto(null);
+    setPhotos((previous) => previous.slice(0, -1));
     setDoneMessage("");
     setCameraError("");
 
@@ -234,20 +248,25 @@ export default function SelfPhoto({ onBack }) {
   }
 
   function retryCamera() {
-    setPhoto(null);
     setCameraError("");
     setRetryToken((previous) => previous + 1);
   }
 
-  function handleDone() {
-    if (!photo) {
-      setDoneMessage("Take a photo or upload one first.");
+  async function handleDone() {
+    if (photos.length < slots) {
+      const missing = slots - photos.length;
+      setDoneMessage(
+        `Take or upload ${missing} more photo${missing > 1 ? "s" : ""} to fill the frame.`
+      );
       return;
     }
 
-    setDoneMessage(
-      "Photo preview is ready. Processed photo results will be available when the backend is implemented."
-    );
+    try {
+      await saveSoloSession(frame.id, photos);
+      onDone?.();
+    } catch (error) {
+      setDoneMessage(error.message || "Unable to save the photos.");
+    }
   }
 
   return (
@@ -264,31 +283,21 @@ export default function SelfPhoto({ onBack }) {
               <div className="self-photo-camera-viewport">
                 <video
                   ref={videoRef}
-                  className={`self-photo-video ${
-                    photo ? "self-photo-video--hidden" : ""
-                  }`}
+                  className="self-photo-video"
                   autoPlay
                   playsInline
                   muted
                   aria-label="Live camera preview"
                 />
 
-                {photo && (
-                  <img
-                    className="self-photo-upload-preview"
-                    src={photo}
-                    alt="Selected photo preview"
-                  />
-                )}
-
-                {cameraStatus === "loading" && !photo && (
+                {cameraStatus === "loading" && (
                   <div className="self-photo-camera-message">
                     <span className="self-photo-spinner" />
                     <p>Starting camera...</p>
                   </div>
                 )}
 
-                {cameraStatus === "error" && !photo && (
+                {cameraStatus === "error" && (
                   <div className="self-photo-camera-message">
                     <p>{cameraError}</p>
                     <button
@@ -353,17 +362,25 @@ export default function SelfPhoto({ onBack }) {
 
           {/* RIGHT: PHOTO RESULTS */}
           <section
-            className="self-photo-results"
+            className={`self-photo-results self-photo-results--${frame.id}`}
             aria-label="Photo results"
           >
             <div className="self-photo-results-list">
-              {[0, 1, 2].map((index) => (
-                <BlurredPlaceholder
-                  key={index}
-                  photo={photo}
-                  index={index}
-                />
-              ))}
+              <div
+                className={`self-photo-frame self-photo-frame--${frame.id}`}
+                style={{
+                  "--columns": frame.columns,
+                  "--rows": slots / frame.columns,
+                }}
+              >
+                {Array.from({ length: slots }, (_, index) => (
+                  <BlurredPlaceholder
+                    key={index}
+                    photo={photos[index]}
+                    index={index}
+                  />
+                ))}
+              </div>
             </div>
 
             <button
