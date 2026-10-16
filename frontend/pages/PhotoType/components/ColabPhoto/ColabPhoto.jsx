@@ -267,7 +267,7 @@ function FormField({
   );
 }
 
-export default function ColabPhoto({ onBack }) {
+export default function ColabPhoto({ onBack, onEnterRoom }) {
   const [createName, setCreateName] = useState("");
   const [createPassword, setCreatePassword] = useState("");
 
@@ -435,9 +435,11 @@ export default function ColabPhoto({ onBack }) {
                     className="colab__submit"
                     type="button"
                     onClick={() =>
-                      navigate(
-                        `/room/${created.session.code}`
-                      )
+                      onEnterRoom
+                        ? onEnterRoom(created.session.code)
+                        : navigate(
+                            `/room/${created.session.code}`
+                          )
                     }
                   >
                     ENTER ROOM
