@@ -49,7 +49,10 @@
   gap: clamp(32px, 8vw, 120px);
 }
 
+/* ============ PRINTER (strip) ============ */
 .edit-strip {
+  position: relative;
+  isolation: isolate;
   flex: none;
 
   display: flex;
@@ -57,39 +60,109 @@
   align-items: center;
 }
 
+/* Pil biru: lapisan paling belakang.
+   Tanpa z-index, supaya garis pink di dalamnya bisa tampil di atas kertas. */
 .edit-strip__slot {
   position: relative;
-  z-index: 1;
-
-  width: calc(100% + 56px);
-  min-width: 210px;
-  height: 52px;
+  width: calc(100% + 80px); /* lebar kertas + 40px kiri & kanan */
+  height: 64px;
 
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  padding-bottom: 12px;
+  padding: 0;
 
-  border: 1px solid var(--pt-burgundy);
+  border: 1.5px solid var(--pt-burgundy);
   border-radius: 999px;
   background: var(--pt-blue);
+
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(70, 36, 30, 0.15);
 }
 
+/* Garis pink: paling depan, lebih lebar dari kertas
+   (lebar pil - 52px = lebar kertas + 28px) */
 .edit-strip__slot-bar {
-  width: calc(100% - 56px);
-  height: 6px;
-  border: 1px solid var(--pt-burgundy);
+  position: relative;
+  z-index: 3;
+
+  width: calc(100% - 52px);
+  height: 14px;
+
+  border: 1.5px solid var(--pt-burgundy);
   border-radius: 999px;
   background: var(--pt-pink);
+
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(70, 36, 30, 0.16);
 }
 
+/* Kertas strip: di depan pil, di belakang garis pink.
+   Tepi atasnya (-30px) tersembunyi di bawah garis pink. */
 .edit-strip__stage {
+  position: relative;
+  z-index: 2;
+  margin-top: -30px;
+
   line-height: 0;
   background: var(--pt-paper);
   box-shadow: 0 4px 8px rgba(70, 36, 30, 0.25);
 }
 
+/* Badan printer: pil lebar, garis pink di tengah */
+.edit-strip__slot {
+  position: relative; /* tanpa z-index agar garis pink bisa tampil di atas kertas */
+  width: calc(100% + 80px);
+  min-width: 240px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0;
+
+  border: 1.5px solid var(--pt-burgundy);
+  border-radius: 999px;
+  background: var(--pt-blue);
+
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(70, 36, 30, 0.15);
+}
+
+/* Garis pink: di tengah pil, paling depan */
+.edit-strip__slot-bar {
+  position: relative;
+  z-index: 3;
+
+  width: 74%;
+  height: 14px;
+
+  border: 1.5px solid var(--pt-burgundy);
+  border-radius: 999px;
+  background: var(--pt-pink);
+
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(70, 36, 30, 0.16);
+}
+
+/* Kertas: keluar dari bawah garis pink, di depan badan printer */
+.edit-strip__stage {
+  position: relative;
+  z-index: 2;
+  margin-top: -25px; /* (tinggi pil 64 / 2) - (tinggi garis 14 / 2) */
+
+  line-height: 0;
+  background: var(--pt-paper);
+  box-shadow: 0 4px 8px rgba(70, 36, 30, 0.25);
+}
+
+/* ============ PANEL ============ */
 .edit-panel {
   flex: none;
   width: min(580px, 52vw);
@@ -537,6 +610,7 @@
   outline-offset: 2px;
 }
 
+/* ============ FOOTER ============ */
 .edit-page__footer {
   flex: none;
   padding: 0 4% clamp(12px, 3vh, 32px);

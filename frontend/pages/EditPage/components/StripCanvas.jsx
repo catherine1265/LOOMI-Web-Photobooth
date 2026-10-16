@@ -107,6 +107,8 @@ export default function StripCanvas({
 
   useEffect(() => {
     const transformer = transformerRef.current;
+    if (!transformer) return;
+
     const node = selectedId ? nodesRef.current.get(selectedId) : null;
     transformer.nodes(node ? [node] : []);
     transformer.getLayer()?.batchDraw();
@@ -134,10 +136,12 @@ export default function StripCanvas({
 
   return (
     <div className="edit-strip">
+      {/* Badan printer: pil biru + garis pink di tengah */}
       <div className="edit-strip__slot" aria-hidden="true">
-        <span className="edit-strip__slot-bar" />
+        <div className="edit-strip__slot-bar" />
       </div>
 
+      {/* Kertas strip: keluar dari bawah garis pink */}
       <div className="edit-strip__stage" ref={containerRef}>
         <Stage
           ref={stageRef}

@@ -356,3 +356,28 @@
     transition: none;
   }
 }
+
+.photo-type__back {
+  margin-top: clamp(8px, 2vh, 24px);
+  padding: 8px 12px;
+
+  border: none;
+  background: transparent;
+  color: var(--pt-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.photo-type__back:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.photo-type__back:focus-visible {
+  outline: 3px solid #b99b56;
+  outline-offset: 4px;
+}

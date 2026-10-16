@@ -1,4 +1,3 @@
-
 import LandingPage from "./pages/LandingPage/LandingPage";
 import PhotoType from "./pages/PhotoType/PhotoType";
 import ColabPhoto from "./pages/PhotoType/components/ColabPhoto/ColabPhoto";
@@ -6,12 +5,18 @@ import SelfPhoto from "./pages/PhotoType/components/SelfPhoto/SelfPhoto";
 import EditPage from "./pages/EditPage/EditPage";
 import FrameType from "./pages/PhotoType/components/FrameType/FrameType";
 import UploadPhoto from "./pages/PhotoType/components/UploadPhoto/UploadPhoto";
+import ResultPhoto from "./pages/ResultPhoto/ResultPhoto.jsx";
 
 import { StrictMode, useEffect, useId, useState } from "react";
 import { createRoot } from "react-dom/client";
 
-import { NAME_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "../lib/config.js";
+import {
+  NAME_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "../lib/config.js";
+
 import { RoomScreen } from "./RoomScreen.jsx";
+
 import {
   createMeeting,
   joinMeeting,
@@ -19,9 +24,14 @@ import {
   saveSession,
 } from "./roomClient.js";
 
-import { CopyButton, inputClass, navigate, primaryButton } from "./ui.jsx";
-import "./index.css";
+import {
+  CopyButton,
+  inputClass,
+  navigate,
+  primaryButton,
+} from "./ui.jsx";
 
+import "./index.css";
 
 function App() {
   const [path, setPath] = useState(window.location.pathname);
@@ -36,7 +46,10 @@ function App() {
     };
 
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+
+    return () => {
+      window.removeEventListener("popstate", onPop);
+    };
   }, []);
 
   const match = /^\/room\/([^/]+)\/?$/.exec(path);
@@ -52,16 +65,17 @@ function App() {
   const isFrameType = path === "/frame-type";
   const isEdit = path === "/edit";
   const isUploadPhoto = path === "/upload-photo";
-
-  function chooseFrameThen(nextPath) {
-    setAfterFrameType(nextPath);
-    navigateInternal("/frame-type");
-  }
+  const isResultPhoto = path === "/result-photo";
 
   function navigateInternal(nextPath) {
     window.history.pushState({}, "", nextPath);
     setPath(nextPath);
     setSearch("");
+  }
+
+  function chooseFrameThen(nextPath) {
+    setAfterFrameType(nextPath);
+    navigateInternal("/frame-type");
   }
 
   useEffect(() => {
@@ -76,18 +90,31 @@ function App() {
             : isUploadPhoto
               ? "LOOMI — Upload Photo"
               : isEdit
-              ? "LOOMI — Edit Photo"
-              : isFrameType
-              ? "LOOMI — Choose Frame Type"
-              : isPhotoType
-                ? "LOOMI — Choose Photo Type"
-                : "LOOMI";
-  }, [code, isLandingPage, isPhotoType, isFrameType, isEdit, isUploadPhoto, isSelfPhoto, isColabPhoto]);
+                ? "LOOMI — Edit Photo"
+                : isFrameType
+                  ? "LOOMI — Choose Frame Type"
+                  : isPhotoType
+                    ? "LOOMI — Choose Photo Type"
+                    : isResultPhoto
+                      ? "LOOMI — Your Photo"
+                      : "LOOMI";
+  }, [
+    code,
+    isLandingPage,
+    isSelfPhoto,
+    isColabPhoto,
+    isUploadPhoto,
+    isEdit,
+    isFrameType,
+    isPhotoType,
+    isResultPhoto,
+  ]);
 
   if (code) {
     return <RoomScreen key={code} code={code} />;
   }
-if (isLandingPage) {
+
+  if (isLandingPage) {
     return (
       <LandingPage
         onGetStarted={() => navigateInternal("/photo-type")}
@@ -96,7 +123,6 @@ if (isLandingPage) {
       />
     );
   }
-
 
   if (isSelfPhoto) {
     return (
@@ -111,7 +137,9 @@ if (isLandingPage) {
   if (isColabPhoto) {
     return (
       <ColabPhoto
-        onEnterRoom={(roomCode) => chooseFrameThen(`/room/${roomCode}`)}
+        onEnterRoom={(roomCode) =>
+          chooseFrameThen(`/room/${roomCode}`)
+        }
         onBack={() => navigateInternal("/photo-type")}
       />
     );
@@ -132,8 +160,23 @@ if (isLandingPage) {
       <EditPage
         onEmpty={() => navigateInternal("/photo-type")}
         onRetake={(id) => {
-          if (id) setFrameType(id);
+          if (id) {
+            setFrameType(id);
+          }
+
           navigateInternal("/self-photo");
+        }}
+        onDone={() => navigateInternal("/result-photo")}
+      />
+    );
+  }
+
+  if (isResultPhoto) {
+    return (
+      <ResultPhoto
+        onGetAnother={() => {
+          setFrameType(null);
+          navigateInternal("/photo-type");
         }}
       />
     );
@@ -160,6 +203,7 @@ if (isLandingPage) {
   if (isPhotoType) {
     return (
       <PhotoType
+        onBack={() => navigateInternal("/")}
         onSelfPhoto={() => chooseFrameThen("/self-photo")}
         onColabPhoto={() => navigateInternal("/colab-photo")}
         onEditPhoto={() => chooseFrameThen("/upload-photo")}
@@ -169,7 +213,6 @@ if (isLandingPage) {
 
   return <HomeScreen />;
 }
-
 
 // ---- Home screen (create / join) ----
 
@@ -186,7 +229,10 @@ function Field({ label, hint, children }) {
       {children(id, hintId)}
 
       {hint && (
-        <p id={hintId} className="text-xs text-slate-500 dark:text-slate-400">
+        <p
+          id={hintId}
+          className="text-xs text-slate-500 dark:text-slate-400"
+        >
           {hint}
         </p>
       )}
@@ -205,9 +251,11 @@ function HomeScreen() {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
 
-  // "/?join=123456" opens the join form with the code filled in.
   useEffect(() => {
-    const join = new URLSearchParams(window.location.search).get("join");
+    const join = new URLSearchParams(
+      window.location.search
+    ).get("join");
+
     if (join && /^\d+$/.test(join)) {
       setMode("join");
       setCode(join);
@@ -224,7 +272,9 @@ function HomeScreen() {
     setError(null);
 
     if (password.length < PASSWORD_MIN_LENGTH) {
-      setError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
+      setError(
+        `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`
+      );
       return;
     }
 
@@ -250,6 +300,7 @@ function HomeScreen() {
 
     try {
       const previous = loadSession(cleanCode);
+
       const session = await joinMeeting({
         code: cleanCode,
         password,
@@ -271,8 +322,14 @@ function HomeScreen() {
 
     return (
       <HomeShell>
-        <section aria-labelledby="created-title" className="space-y-5">
-          <h2 id="created-title" className="text-lg font-semibold">
+        <section
+          aria-labelledby="created-title"
+          className="space-y-5"
+        >
+          <h2
+            id="created-title"
+            className="text-lg font-semibold"
+          >
             Meeting created
           </h2>
 
@@ -280,13 +337,17 @@ function HomeScreen() {
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Meeting code
             </p>
+
             <p className="font-mono text-4xl font-bold tracking-[0.2em]">
               {created.session.code}
             </p>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="invite" className="block text-sm font-medium">
+            <label
+              htmlFor="invite"
+              className="block text-sm font-medium"
+            >
               Invite text
             </label>
 
@@ -302,8 +363,8 @@ function HomeScreen() {
             <CopyButton text={invite} label="Copy invite" />
 
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Share it privately. The password is not shown again once you
-              leave this page.
+              Share it privately. The password is not shown again
+              once you leave this page.
             </p>
           </div>
 
@@ -405,11 +466,15 @@ function HomeScreen() {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete={
-                  mode === "create" ? "new-password" : "current-password"
+                  mode === "create"
+                    ? "new-password"
+                    : "current-password"
                 }
                 required
                 minLength={
-                  mode === "create" ? PASSWORD_MIN_LENGTH : undefined
+                  mode === "create"
+                    ? PASSWORD_MIN_LENGTH
+                    : undefined
                 }
                 aria-describedby={hintId}
                 value={password}
@@ -438,7 +503,11 @@ function HomeScreen() {
           </p>
         )}
 
-        <button type="submit" disabled={busy} className={primaryButton}>
+        <button
+          type="submit"
+          disabled={busy}
+          className={primaryButton}
+        >
           {busy
             ? "Please wait…"
             : mode === "create"
@@ -454,7 +523,10 @@ function HomeShell({ children }) {
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-2rem)] max-w-md flex-col justify-center px-4 py-10">
       <header className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Venture Creation</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Venture Creation
+        </h1>
+
         <p className="mt-2 text-slate-600 dark:text-slate-400">
           A photobooth video room: everyone's camera, layered into one picture.
         </p>
@@ -467,10 +539,8 @@ function HomeShell({ children }) {
   );
 }
 
-// ---- Start ----
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 );
