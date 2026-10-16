@@ -13,6 +13,7 @@ import {
 } from "./editorData.js";
 import StripCanvas from "./components/StripCanvas.jsx";
 import EditorPanel from "./components/EditorPanel.jsx";
+import { setResultPhoto } from "../ResultPhoto/ResultPhoto.js";
 
 const INITIAL_EDITS = { effectId: "original", background: null, stickers: [], texts: [] };
 
@@ -20,7 +21,7 @@ function newId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export default function EditPage({ onEmpty, onRetake }) {
+export default function EditPage({ onEmpty, onRetake , onDone}) {
   const session = usePhotoSession();
   const stageRef = useRef(null);
   const transformerRef = useRef(null);
@@ -173,24 +174,31 @@ export default function EditPage({ onEmpty, onRetake }) {
   function handleDone() {
     const stage = stageRef.current;
     const transformer = transformerRef.current;
-    const previousNodes = transformer.nodes();
+
+    if (!stage) {
+      setError("Unable to generate your photo. Please try again.");
+      return;
+    }
+
+    const previousNodes = transformer?.nodes() ?? [];
 
     try {
-      transformer.nodes([]);
+      transformer?.nodes([]);
+
       const url = stage.toDataURL({
         pixelRatio: spec.width / stage.width(),
         mimeType: "image/png",
       });
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `loomi-${session.frameType}.png`;
-      link.click();
+      setResultPhoto(url);
+      onDone?.();
     } catch (exportError) {
-      setError(exportError.message);
+      setError(exportError.message || "Unable to save your photo.");
     } finally {
-      transformer.nodes(previousNodes);
-      transformer.getLayer()?.batchDraw();
+      if (transformer) {
+        transformer.nodes(previousNodes);
+        transformer.getLayer()?.batchDraw();
+      }
     }
   }
 

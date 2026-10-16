@@ -133,7 +133,7 @@ function Sparkle({ className = "" }) {
   );
 }
 
-export default function PhotoType({ onSelfPhoto, onColabPhoto, onEditPhoto }) {
+export default function PhotoType({ onBack, onSelfPhoto, onColabPhoto, onEditPhoto }) {
   const options = [
     { type: "self", label: "Self Photo", action: onSelfPhoto },
     { type: "colab", label: "Colab Photo", action: onColabPhoto },
@@ -172,6 +172,12 @@ export default function PhotoType({ onSelfPhoto, onColabPhoto, onEditPhoto }) {
             ))}
           </div>
         </div>
+        <button
+          type="button"
+          className="photo-type__back"
+          onClick={onBack}>
+          Back
+        </button>
       </section>
     </main>
   );

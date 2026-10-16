@@ -1,0 +1,293 @@
+.result-photo-page {
+  --pt-burgundy: #652b2b;
+  --pt-blue: #cbdce5;
+  --pt-pink: #fadde4;
+  --pt-paper: #fff5ee;
+
+  height: 100vh;
+  height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  color: var(--pt-burgundy);
+  background-color: #fff8f0;
+  background-image: url("/images/Background.png");
+  background-position: center;
+  background-repeat: repeat;
+  background-size: cover;
+}
+
+.result-photo,
+.result-photo * {
+  box-sizing: border-box;
+}
+
+.result-photo {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: clamp(24px, 5vh, 48px) 20px 24px;
+  overflow-y: auto;
+}
+
+.result-photo__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============ PRINTER ============
+   Lebar printer = lebar pil biru.
+   Semua ukuran lain (kertas, garis slot) mengikuti persentase lebar ini.
+   Lebar juga dibatasi tinggi layar supaya strip foto tidak terpotong. */
+.result-photo__printer {
+  position: relative;
+  isolation: isolate;
+
+  width: min(560px, 92vw, calc((100dvh - 230px) * 0.6));
+  min-width: 220px;
+}
+
+/* Kepala printer (pil biru + garis pink) */
+.result-photo__head {
+  position: relative; /* tanpa z-index agar anak ikut stacking printer */
+  width: 100%;
+  aspect-ratio: 6 / 1;
+}
+
+.result-photo__slot-shell {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+
+  border: 2px solid var(--pt-burgundy);
+  border-radius: 999px;
+  background: var(--pt-blue);
+
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(70, 36, 30, 0.15);
+}
+
+/* Garis pink di tengah pil, paling depan */
+.result-photo__slot-bar {
+  position: absolute;
+  z-index: 3;
+
+  top: 50%;
+  left: 50%;
+
+  width: 74%;
+  aspect-ratio: 20 / 1;
+
+  transform: translate(-50%, -50%);
+
+  border: 2px solid var(--pt-burgundy);
+  border-radius: 999px;
+  background: var(--pt-pink);
+
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(70, 36, 30, 0.16);
+}
+
+/* ============ KERTAS ============
+   Lebih sempit dari printer, mulai tepat di bawah garis pink.
+   Margin atas negatif = setengah tinggi pil (8.33%) - setengah tinggi garis (1.85%).
+   Wrapper meng-clip kertas, sehingga kertas terlihat keluar dari slot. */
+.result-photo__paper-clip {
+  position: relative;
+  z-index: 2;
+
+  width: 66%;
+  margin: -6.5% auto 0;
+
+  overflow: hidden;
+  filter: drop-shadow(0 4px 6px rgba(70, 36, 30, 0.25));
+}
+
+.result-photo__paper {
+  background: var(--pt-paper);
+
+  transform: translateY(-100%);
+  animation: print-strip 3s cubic-bezier(0.45, 0.05, 0.3, 1) 0.3s forwards;
+}
+
+.result-photo__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Kertas meluncur turun keluar dari slot (sedikit tersendat seperti printer) */
+@keyframes print-strip {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  30% {
+    transform: translateY(-62%);
+  }
+
+  38% {
+    transform: translateY(-60%);
+  }
+
+  75% {
+    transform: translateY(-8%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ============ DOWNLOAD & SHARE ============ */
+.result-photo__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  margin-top: 18px;
+
+  opacity: 0;
+  animation: show-actions 0.4s ease-out 3.4s forwards;
+}
+
+.result-photo__action {
+  width: 34px;
+  height: 34px;
+  padding: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1.5px solid var(--pt-burgundy);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--pt-burgundy);
+
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.result-photo__action svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.result-photo__action:hover {
+  background: #fff5cb;
+  transform: translateY(-2px);
+}
+
+@keyframes show-actions {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ GET ANOTHER ONE ============ */
+.result-photo__again {
+  position: fixed;
+  right: clamp(16px, 3vw, 36px);
+  bottom: clamp(18px, 3vh, 30px);
+
+  min-height: 30px;
+  padding: 5px 14px;
+
+  border: 1px solid var(--pt-burgundy);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--pt-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.result-photo__again:hover {
+  background: #fff5cb;
+  transform: translateY(-2px);
+}
+
+.result-photo__message {
+  max-width: min(320px, 80vw);
+  margin: 10px 0 0;
+
+  font-size: 12px;
+  text-align: center;
+}
+
+.result-photo__empty {
+  margin: auto;
+  font-family: Georgia, "Times New Roman", serif;
+  text-align: center;
+}
+
+.result-photo button:focus-visible {
+  outline: 3px solid #b99b56;
+  outline-offset: 3px;
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .result-photo {
+    padding: 28px 16px 22px;
+  }
+
+  .result-photo__printer {
+    width: min(340px, 92vw, calc((100dvh - 210px) * 0.6));
+  }
+
+  .result-photo__slot-shell,
+  .result-photo__slot-bar {
+    border-width: 1.5px;
+  }
+
+  .result-photo__again {
+    right: 14px;
+    bottom: 16px;
+  }
+}
+
+/* Hormati pengaturan pengurangan animasi */
+@media (prefers-reduced-motion: reduce) {
+  .result-photo__paper {
+    animation: none;
+    transform: none;
+  }
+
+  .result-photo__actions {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

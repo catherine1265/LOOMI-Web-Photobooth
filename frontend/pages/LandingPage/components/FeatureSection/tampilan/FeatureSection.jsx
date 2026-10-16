@@ -139,6 +139,7 @@ const features = [
   {
     title: "Self Photo",
     mode: "self",
+    image : "/images/SelfPhoto.png",
     x: 140,
     y: 356,
     r: -7,
@@ -147,6 +148,7 @@ const features = [
   {
     title: "Colab Photo",
     mode: "colab",
+    image : "/images/ColabPhoto.png",
     x: 454.5,
     y: 354.5,
     r: 0,
@@ -252,7 +254,13 @@ export default function FeatureSection({
             </svg>
 
             <div className="frame-body" aria-hidden="true" />
-            <div className="frame-photo" aria-hidden="true" />
+            <div className="frame-photo">
+              <img
+                src={feature.image}
+                alt={feature.title}
+                loading="lazy"
+              />
+            </div>
 
             <button
               type="button"
