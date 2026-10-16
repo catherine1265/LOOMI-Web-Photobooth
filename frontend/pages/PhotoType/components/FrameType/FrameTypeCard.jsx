@@ -10,19 +10,17 @@ export default function FrameTypeCard({ layout, selected, onSelect }) {
       aria-label={`${label} photo layout`}
     >
       <span className="frame-type__paper">
-        {image ? (
-          <img className="frame-type__image" src={image} alt={`${label} layout preview`} />
-        ) : (
-          <span
-            className="frame-type__slots"
-            style={{ "--columns": columns, "--rows": slots / columns }}
-            aria-hidden="true"
-          >
-            {Array.from({ length: slots }, (_, index) => (
-              <span className="frame-type__slot" key={index} />
-            ))}
-          </span>
-        )}
+        <span
+          className="frame-type__slots"
+          style={{ "--columns": columns, "--rows": slots / columns }}
+          aria-hidden="true"
+        >
+          {Array.from({ length: slots }, (_, index) => (
+            <span className="frame-type__slot" key={index}>
+              {image && <img src={image} alt="" />}
+            </span>
+          ))}
+        </span>
       </span>
 
       <span className="frame-type__label">{label}</span>

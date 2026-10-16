@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "loomi.photoSession";
 const JPEG_QUALITY = 0.92;
+const MAX_SIDE = 1600;
 
 function load() {
   try {
@@ -55,12 +56,13 @@ function toJpeg(src) {
     const image = new Image();
     image.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
+      const ratio = Math.min(1, MAX_SIDE / Math.max(image.naturalWidth, image.naturalHeight));
+      canvas.width = Math.round(image.naturalWidth * ratio);
+      canvas.height = Math.round(image.naturalHeight * ratio);
       const context = canvas.getContext("2d");
       context.fillStyle = "#fff";
       context.fillRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(image, 0, 0);
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
       resolve(canvas.toDataURL("image/jpeg", JPEG_QUALITY));
     };
     image.onerror = () => reject(new Error("Unable to read a photo."));

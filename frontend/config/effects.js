@@ -1,0 +1,22 @@
+export const effects = [
+  { id: "original", name: "Original", filter: "none" },
+  { id: "bw", name: "B&W", filter: "grayscale(1) contrast(1.1)" },
+  { id: "sepia", name: "Sepia", filter: "sepia(1)" },
+  { id: "warm", name: "Warm", filter: "sepia(0.35) saturate(1.3) brightness(1.05)" },
+  { id: "cool", name: "Cool", filter: "sepia(0.2) hue-rotate(160deg) saturate(1.2)" },
+  { id: "vivid", name: "Vivid", filter: "saturate(1.8) contrast(1.1)" },
+  { id: "fade", name: "Fade", filter: "contrast(0.85) brightness(1.1) saturate(0.8)" },
+  { id: "moody", name: "Moody", filter: "brightness(0.7) contrast(1.25) saturate(0.9)" },
+  {
+    id: "soft-pink",
+    name: "Soft Pink",
+    filter: "sepia(0.25) hue-rotate(-30deg) saturate(1.6) brightness(1.08)",
+  },
+  { id: "vintage", name: "Vintage", filter: "sepia(0.5) contrast(0.95) saturate(1.2) brightness(0.95)" },
+  { id: "noir", name: "Noir", filter: "grayscale(1) contrast(1.5) brightness(0.8)" },
+  { id: "dreamy", name: "Dreamy", filter: "brightness(1.2) contrast(0.9) saturate(1.4)" },
+  { id: "punch", name: "Punch", filter: "contrast(1.3) saturate(1.3)" },
+  { id: "golden", name: "Golden", filter: "sepia(0.6) hue-rotate(-10deg) saturate(1.8)" },
+  { id: "night", name: "Night", filter: "brightness(0.6) hue-rotate(190deg) saturate(1.2)" },
+  { id: "film", name: "Film", filter: "sepia(0.3) brightness(1.05) contrast(1.1) saturate(1.1)" },
+];
