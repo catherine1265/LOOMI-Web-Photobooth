@@ -4,7 +4,10 @@
   --pt-cream: #fff5cb;
   --pt-blue: rgba(202, 220, 230, 0.88);
 
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   color: var(--pt-burgundy);
   background-color: #f7f5ef;
@@ -41,8 +44,10 @@
 /* Main layout */
 .photo-type {
   width: 100%;
+  flex: 1;
+  min-height: 0;
   box-sizing: border-box;
-  padding: 41px 5% 40px;
+  padding: clamp(16px, 4vh, 41px) 5% clamp(12px, 3vh, 40px);
 
   display: flex;
   flex-direction: column;
@@ -53,7 +58,7 @@
 .photo-type__heading {
   position: relative;
   z-index: 2;
-  margin-bottom: 80px;
+  margin-bottom: clamp(24px, 7vh, 80px);
 
   display: flex;
   justify-content: center;
@@ -92,7 +97,8 @@
 
   width: 100%;
   max-width: 1500px;
-  height: 540px;
+  flex: 0 1 540px;
+  min-height: 0;
   box-sizing: border-box;
   padding: 44px 50px 36px;
 
@@ -154,7 +160,7 @@
 
 /* Circular icons */
 .photo-type__icon {
-  width: 240px;
+  width: clamp(110px, 30dvh, 240px);
   aspect-ratio: 1;
   box-sizing: border-box;
 
@@ -261,7 +267,7 @@
 /* Tablet */
 @media (max-width: 760px) {
   .photo-type__ticket {
-    height: 340px;
+    flex-basis: 340px;
     padding: 40px 24px 32px;
   }
 
@@ -287,6 +293,11 @@
 
 /* Mobile */
 @media (max-width: 520px) {
+  .photo-type-page {
+    height: auto;
+    min-height: 100vh;
+  }
+
   .photo-type {
     padding: 28px 18px 30px;
   }
@@ -301,7 +312,7 @@
   }
 
   .photo-type__ticket {
-    height: auto;
+    flex: none;
     padding: 50px 18px;
   }
 

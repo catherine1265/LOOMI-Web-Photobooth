@@ -3,13 +3,26 @@ import "./style/FrameType.css";
 import Navbar from "../../../Navbar/tampilan/Navbar";
 import FrameTypeCard from "./FrameTypeCard";
 
+const previewFiles = import.meta.glob("../../../../assets/frame-types/*.{png,jpg,jpeg,webp,svg}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+const previewImages = Object.fromEntries(
+  Object.entries(previewFiles).map(([path, src]) => [
+    path.split("/").pop().replace(/\.[^.]+$/, ""),
+    src,
+  ])
+);
+
 export const photoTypes = [
-  { id: "1x1", label: "1x1", image: null, slots: 1, columns: 1 },
-  { id: "1x2", label: "1x2", image: null, slots: 2, columns: 1 },
-  { id: "1x3", label: "1x3", image: null, slots: 3, columns: 1 },
-  { id: "1x4", label: "1x4", image: null, slots: 4, columns: 1 },
-  { id: "2x2", label: "2x2", image: null, slots: 4, columns: 2 },
-];
+  { id: "1x1", label: "1x1", slots: 1, columns: 1 },
+  { id: "1x2", label: "1x2", slots: 2, columns: 1 },
+  { id: "1x3", label: "1x3", slots: 3, columns: 1 },
+  { id: "1x4", label: "1x4", slots: 4, columns: 1 },
+  { id: "2x2", label: "2x2", slots: 4, columns: 2 },
+].map((type) => ({ ...type, image: previewImages[type.id] ?? null }));
 
 const NOTCH_R = 24;
 const PITCH_X = 75;
