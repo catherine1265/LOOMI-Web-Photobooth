@@ -21,13 +21,74 @@ export const TABS = [
   { id: "text", label: "TEXT" },
 ];
 
-export const frames = [
-  { id: "floral", src: floral, accent: "#f5c9c2" },
-  { id: "dots", src: dots, accent: "#f6efdf" },
-  { id: "stars", src: stars, accent: "#ffffff" },
-  { id: "lace", src: lace, accent: "#f4dfe4" },
-  { id: "flowers", src: flowers, accent: "#f7e3a3" },
-  { id: "plaid", src: plaid, accent: "#d9d0dc" },
+// Frame dikelompokkan per tema (folder). Frame baru: taruh gambar di
+// frontend/assets/frames/<id-tema>/ (mis. frames/y2k/frame1.png), otomatis muncul.
+// Enam frame lama di bawah dipakai sementara sebagai isi awal tema.
+const themeFrameFiles = import.meta.glob("../../assets/frames/*/*.{png,jpg,jpeg,webp,svg}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+// Gambar cover folder: taruh di frontend/assets/folders/<id-tema>.png
+// (mis. folders/y2k.png). Kalau belum ada, cover memakai frame pertama tema itu.
+const folderCoverFiles = import.meta.glob("../../assets/folders/*.{png,jpg,jpeg,webp,svg}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+function folderCover(themeId) {
+  const match = Object.entries(folderCoverFiles).find(
+    ([path]) => path.split("/").pop().replace(/\.[^.]+$/, "") === themeId
+  );
+  return match ? match[1] : null;
+}
+
+function themeFrames(themeId, starter = []) {
+  const added = Object.entries(themeFrameFiles)
+    .filter(([path]) => path.split("/").slice(-2, -1)[0] === themeId)
+    .sort(([first], [second]) => first.localeCompare(second, undefined, { numeric: true }))
+    .map(([path, src]) => ({ id: `${themeId}-${path.split("/").pop().replace(/\.[^.]+$/, "")}`, src }));
+
+  return [...added, ...starter];
+}
+
+export const frameThemes = [
+  {
+    id: "y2k",
+    cover: folderCover("y2k"),
+    label: "Y2K",
+    accent: "#d9d0dc",
+    frames: themeFrames("y2k", [{ id: "stars", src: stars }]),
+  },
+  {
+    id: "vintage",
+    cover: folderCover("vintage"),
+    label: "Vintage",
+    accent: "#f6efdf",
+    frames: themeFrames("vintage", [
+      { id: "dots", src: dots },
+      { id: "plaid", src: plaid },
+    ]),
+  },
+  {
+    id: "kidcore",
+    cover: folderCover("kidcore"),
+    label: "Kidcore",
+    accent: "#f7e3a3",
+    frames: themeFrames("kidcore", [{ id: "flowers", src: flowers }]),
+  },
+  {
+    id: "soft",
+    cover: folderCover("soft"),
+    label: "Soft",
+    accent: "#f5c9c2",
+    frames: themeFrames("soft", [
+      { id: "floral", src: floral },
+      { id: "lace", src: lace },
+    ]),
+  },
 ];
 
 const stickerFiles = import.meta.glob("../../assets/stickers/*.{png,jpg,jpeg,webp,svg}", {

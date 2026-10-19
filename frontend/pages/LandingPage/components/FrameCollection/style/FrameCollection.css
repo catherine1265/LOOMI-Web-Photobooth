@@ -335,6 +335,25 @@
     calc(3 * var(--u));
 
   background: var(--folder-fill);
+  background-size: cover;
+  background-position: center;
+}
+
+/* NAMA TEMA (di bawah folder) */
+
+.folder-label {
+  position: absolute;
+  top: calc(112 * var(--u));
+  left: 0;
+  width: 100%;
+
+  color: #682326;
+  font-family: "Poppins", sans-serif;
+  font-size: calc(9 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 /* PEGANGAN FOLDER */
@@ -354,6 +373,118 @@
   background: #9b7166;
 
   box-shadow: 0 calc(1 * var(--u)) 0 #f7ded7;
+}
+
+
+/* ============ VIEWER FRAME (setelah folder diklik, hanya lihat) ============ */
+
+.collection-viewer {
+  position: absolute;
+  top: calc(205 * var(--u));
+  left: calc(99 * var(--u));
+
+  width: calc(740 * var(--u));
+  height: calc(400 * var(--u));
+
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-viewer-header {
+  flex: none;
+  margin-bottom: calc(10 * var(--u));
+
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.collection-back {
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+  padding: calc(5 * var(--u));
+
+  border: calc(1 * var(--u)) solid #95665f;
+  border-radius: 50%;
+  background: #fffbea;
+  color: #682326;
+
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.collection-back:hover {
+  transform: translateX(calc(-2 * var(--u)));
+}
+
+.collection-back:focus-visible {
+  outline: calc(2 * var(--u)) solid #682326;
+  outline-offset: calc(2 * var(--u));
+}
+
+.collection-back svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.collection-viewer-title {
+  margin: 0;
+
+  color: #682326;
+  font-family: "Poppins", sans-serif;
+  font-size: calc(13 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.collection-viewer-list {
+  flex: 1;
+  min-height: 0;
+  padding: calc(4 * var(--u)) calc(4 * var(--u)) calc(12 * var(--u));
+
+  display: flex;
+  align-items: flex-start;
+  gap: calc(22 * var(--u));
+
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.collection-viewer-empty {
+  margin: 0;
+  color: #682326;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: calc(12 * var(--u));
+}
+
+/* Strip frame: hanya tampilan, tidak bisa diklik */
+.collection-strip {
+  position: relative;
+  flex: none;
+
+  height: calc(330 * var(--u));
+  aspect-ratio: 591 / 1772;
+
+  border: calc(1 * var(--u)) solid #95665f;
+  border-radius: calc(4 * var(--u));
+  background-color: #fff8ec;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 calc(3 * var(--u)) calc(5 * var(--u)) #55302a40;
+
+  user-select: none;
+}
+
+/* Kotak foto kosong */
+.collection-strip-slot {
+  position: absolute;
+
+  border: calc(1 * var(--u)) solid #95665f;
+  border-radius: calc(5 * var(--u));
+  background: #fffdf6;
+  box-shadow: inset 0 calc(1 * var(--u)) calc(3 * var(--u)) #55302a26;
 }
 
 
@@ -445,4 +576,19 @@
   .collection-bottom-nav {
     height: calc(50 * var(--u));
   }
+
+  .collection-viewer {
+    position: relative;
+    top: auto;
+    left: auto;
+
+    width: calc(340 * var(--u));
+    height: calc(420 * var(--u));
+    margin: 0 auto;
+  }
+
+  .collection-strip {
+    height: calc(340 * var(--u));
+  }
+
 }

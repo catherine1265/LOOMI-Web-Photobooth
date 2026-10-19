@@ -1,15 +1,26 @@
+import { useState } from "react";
 import "../style/FrameCollection.css";
+import { frameThemes } from "../../../../EditPage/editorData.js";
+import { getSlotRects, printSpec } from "../../../../../printSpec.js";
 
-const frames = [
-  { id: 1, name: "Frame 1", color: "beige" },
-  { id: 2, name: "Frame 2", color: "pink" },
-  { id: 3, name: "Frame 3", color: "blue" },
-  { id: 4, name: "Frame 4", color: "peach" },
-  { id: 5, name: "Frame 5", color: "pink" },
-  { id: 6, name: "Frame 6", color: "yellow" },
-  { id: 7, name: "Frame 7", color: "blue" },
-  { id: 8, name: "Frame 8", color: "peach" },
-];
+/* Folder = tema yang sama dengan tab Frame di halaman edit.
+   Di sini hanya untuk melihat-lihat, frame tidak bisa dipilih. */
+const FOLDER_COLORS = {
+  y2k: "blue",
+  vintage: "beige",
+  kidcore: "yellow",
+  soft: "pink",
+};
+
+/* Kotak foto kosong di tiap frame (posisi diambil dari printSpec 1x3,
+   jadi sama dengan strip di halaman edit) */
+const PREVIEW_SPEC = printSpec["1x3"];
+const PREVIEW_SLOTS = getSlotRects(PREVIEW_SPEC).map((slot) => ({
+  left: `${(slot.x / PREVIEW_SPEC.width) * 100}%`,
+  top: `${(slot.y / PREVIEW_SPEC.height) * 100}%`,
+  width: `${(slot.width / PREVIEW_SPEC.width) * 100}%`,
+  height: `${(slot.height / PREVIEW_SPEC.height) * 100}%`,
+}));
 
 /* bentuk bintang: SAMA dengan sparkle di FeatureSection */
 const STAR_PATH =
@@ -63,6 +74,9 @@ function Sparkle({ className = "" }) {
 }
 
 export default function FrameCollection() {
+  const [themeId, setThemeId] = useState(null);
+  const theme = frameThemes.find((item) => item.id === themeId);
+
   return (
     <section className="frame-collection" id="frame-collection">
       <div className="collection-curtain" aria-hidden="true" />
@@ -75,24 +89,77 @@ export default function FrameCollection() {
           <Sparkle className="collection-sparkle-right" />
         </div>
 
-        <div className="collection-grid">
-          {frames.map((frame) => (
-            <button
-              key={frame.id}
-              type="button"
-              className={`collection-frame ${frame.color}`}
-              aria-label={`Choose ${frame.name}`}
-              onClick={() => console.log(`Selected ${frame.name}`)}
-            >
-              <span className="folder-tab" aria-hidden="true" />
+        {theme ? (
+          <div className="collection-viewer">
+            <div className="collection-viewer-header">
+              <button
+                type="button"
+                className="collection-back"
+                aria-label="Back to frame folders"
+                onClick={() => setThemeId(null)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="m15 5-7 7 7 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <p className="collection-viewer-title">{theme.label}</p>
+            </div>
 
-              <span className="folder-body">
-                <span className="folder-preview" aria-hidden="true" />
-                <span className="folder-handle" aria-hidden="true" />
-              </span>
-            </button>
-          ))}
-        </div>
+            <div className="collection-viewer-list">
+              {theme.frames.length === 0 && (
+                <p className="collection-viewer-empty">Frames coming soon.</p>
+              )}
+              {theme.frames.map((frame) => (
+                <div
+                  key={frame.id}
+                  className="collection-strip"
+                  style={{ backgroundImage: `url("${frame.src}")` }}
+                  role="img"
+                  aria-label={`${theme.label} frame`}
+                >
+                  {PREVIEW_SLOTS.map((slot, index) => (
+                    <span key={index} className="collection-strip-slot" style={slot} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="collection-grid">
+            {frameThemes.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`collection-frame ${FOLDER_COLORS[item.id] ?? "beige"}`}
+                aria-label={`Open ${item.label} frames`}
+                onClick={() => setThemeId(item.id)}
+              >
+                <span className="folder-tab" aria-hidden="true" />
+
+                <span className="folder-body">
+                  <span
+                    className="folder-preview"
+                    aria-hidden="true"
+                    style={
+                      item.cover || item.frames[0]
+                        ? { backgroundImage: `url("${item.cover ?? item.frames[0].src}")` }
+                        : undefined
+                    }
+                  />
+                  <span className="folder-handle" aria-hidden="true" />
+                </span>
+
+                <span className="folder-label">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="collection-bottom-nav" aria-hidden="true" />
