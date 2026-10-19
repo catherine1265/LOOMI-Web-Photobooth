@@ -1,10 +1,3 @@
-import floral from "../../assets/frames/floral.svg";
-import dots from "../../assets/frames/dots.svg";
-import stars from "../../assets/frames/stars.svg";
-import lace from "../../assets/frames/lace.svg";
-import flowers from "../../assets/frames/flowers.svg";
-import plaid from "../../assets/frames/plaid.svg";
-
 export const UPLOAD_TYPES = ["image/png", "image/jpeg", "image/webp"];
 export const UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
 
@@ -21,17 +14,12 @@ export const TABS = [
   { id: "text", label: "TEXT" },
 ];
 
-// Frame dikelompokkan per tema (folder). Frame baru: taruh gambar di
-// frontend/assets/frames/<id-tema>/ (mis. frames/y2k/frame1.png), otomatis muncul.
-// Enam frame lama di bawah dipakai sementara sebagai isi awal tema.
 const themeFrameFiles = import.meta.glob("../../assets/frames/*/*.{png,jpg,jpeg,webp,svg}", {
   eager: true,
   query: "?url",
   import: "default",
 });
 
-// Gambar cover folder: taruh di frontend/assets/folders/<id-tema>.png
-// (mis. folders/y2k.png). Kalau belum ada, cover memakai frame pertama tema itu.
 const folderCoverFiles = import.meta.glob("../../assets/folders/*.{png,jpg,jpeg,webp,svg}", {
   eager: true,
   query: "?url",
@@ -60,34 +48,28 @@ export const frameThemes = [
     cover: folderCover("y2k"),
     label: "Y2K",
     accent: "#d9d0dc",
-    frames: themeFrames("y2k", [{ id: "stars", src: stars }]),
+    frames: themeFrames("y2k"),
   },
   {
     id: "vintage",
     cover: folderCover("vintage"),
     label: "Vintage",
     accent: "#f6efdf",
-    frames: themeFrames("vintage", [
-      { id: "dots", src: dots },
-      { id: "plaid", src: plaid },
-    ]),
+    frames: themeFrames("vintage"),
   },
   {
     id: "kidcore",
     cover: folderCover("kidcore"),
     label: "Kidcore",
     accent: "#f7e3a3",
-    frames: themeFrames("kidcore", [{ id: "flowers", src: flowers }]),
+    frames: themeFrames("kidcore"),
   },
   {
     id: "soft",
     cover: folderCover("soft"),
     label: "Soft",
     accent: "#f5c9c2",
-    frames: themeFrames("soft", [
-      { id: "floral", src: floral },
-      { id: "lace", src: lace },
-    ]),
+    frames: themeFrames("soft"),
   },
 ];
 

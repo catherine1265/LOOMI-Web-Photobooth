@@ -87,7 +87,7 @@ export default function FrameTab({ background, onSelect }) {
                       : { backgroundColor: item.accent }
                   }
                 >
-                  {!item.cover && <span className="edit-frames__label">{item.label}</span>}
+                  <span className="edit-frames__label">{item.label}</span>
                 </span>
               </span>
             </button>
