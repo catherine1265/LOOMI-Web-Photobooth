@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../style/FrameCollection.css";
-import { frameThemes } from "../../../../EditPage/editorData.js";
+import { colorFolderCover, frameThemes } from "../../../../EditPage/editorData.js";
 import { getSlotRects, printSpec } from "../../../../../printSpec.js";
 
 /* Folder = tema yang sama dengan tab Frame di halaman edit.
@@ -10,7 +10,29 @@ const FOLDER_COLORS = {
   vintage: "beige",
   kidcore: "yellow",
   soft: "pink",
+  abstract: "peach",
+  dark: "blue",
+  basic: "beige",
+  color: "peach",
 };
+
+const COLOR_THEME = {
+  id: "color",
+  label: "Color",
+  cover: colorFolderCover,
+  frames: [
+    "#fff5cb",
+    "#fadde4",
+    "#cbdce5",
+    "#f0e9b5",
+    "#f2a8b9",
+    "#fff8ec",
+    "#ffffff",
+    "#652b2b",
+  ].map((color) => ({ id: `color-${color}`, color })),
+};
+
+const FOLDERS = [...frameThemes, COLOR_THEME];
 
 /* Kotak foto kosong di tiap frame (posisi diambil dari printSpec 1x3,
    jadi sama dengan strip di halaman edit) */
@@ -75,7 +97,7 @@ function Sparkle({ className = "" }) {
 
 export default function FrameCollection() {
   const [themeId, setThemeId] = useState(null);
-  const theme = frameThemes.find((item) => item.id === themeId);
+  const theme = FOLDERS.find((item) => item.id === themeId);
 
   return (
     <section className="frame-collection" id="frame-collection">
@@ -119,7 +141,12 @@ export default function FrameCollection() {
                 <div
                   key={frame.id}
                   className="collection-strip"
-                  style={{ backgroundImage: `url("${frame.src}")` }}
+                  style={{
+                    ...(frame.color
+                      ? { backgroundColor: frame.color }
+                      : { backgroundImage: `url("${frame.src}")` }),
+                    aspectRatio: `${PREVIEW_SPEC.width} / ${PREVIEW_SPEC.height}`,
+                  }}
                   role="img"
                   aria-label={`${theme.label} frame`}
                 >
@@ -132,7 +159,7 @@ export default function FrameCollection() {
           </div>
         ) : (
           <div className="collection-grid">
-            {frameThemes.map((item) => (
+            {FOLDERS.map((item) => (
               <button
                 key={item.id}
                 type="button"
@@ -147,7 +174,7 @@ export default function FrameCollection() {
                     className="folder-preview"
                     aria-hidden="true"
                     style={
-                      item.cover || item.frames[0]
+                      item.cover || item.frames[0]?.src
                         ? { backgroundImage: `url("${item.cover ?? item.frames[0].src}")` }
                         : undefined
                     }

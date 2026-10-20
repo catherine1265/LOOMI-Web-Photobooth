@@ -4,6 +4,8 @@ import "./style/SelfPhoto.css";
 import Navbar from "../../../Navbar/tampilan/Navbar";
 import { photoTypes } from "../FrameType/FrameType";
 import { saveSoloSession } from "../../../../photoStore.js";
+import { poses } from "./poses.js";
+import PoseIdeas from "./PoseIdeas.jsx";
 
 function Sparkle({ className = "" }) {
   return (
@@ -56,10 +58,21 @@ function RetakeIcon() {
   );
 }
 
-function BlurredPlaceholder({ photo, index }) {
+function BlurredPlaceholder({ photo, index, hint, onHintClick }) {
   return (
     <div className="self-photo__result-image">
-      {photo ? (
+      {!photo && hint ? (
+        <button
+          type="button"
+          className="self-photo__pose-hint"
+          onClick={onHintClick}
+          aria-label={`Pose idea for photo ${index + 1}. Click to change the pose ideas`}
+          title="Click to change the pose ideas"
+        >
+          <img src={hint} alt="" loading="lazy" />
+          <span className="self-photo__pose-tag">Pose</span>
+        </button>
+      ) : photo ? (
         <img
           src={photo}
           alt={`Photo result ${index + 1}`}
@@ -93,6 +106,8 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
   const [photos, setPhotos] = useState([]);
   const [doneMessage, setDoneMessage] = useState("");
   const [retryToken, setRetryToken] = useState(0);
+  const [poseOpen, setPoseOpen] = useState(false);
+  const [selectedPoses, setSelectedPoses] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -199,6 +214,13 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     addPhoto(canvas.toDataURL("image/jpeg", 0.92));
+  }
+
+  function togglePose(source) {
+    setSelectedPoses((previous) => {
+      if (previous.includes(source)) return previous.filter((item) => item !== source);
+      return previous.length < slots ? [...previous, source] : previous;
+    });
   }
 
   function addPhoto(source) {
@@ -329,18 +351,20 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
               <button
                 type="button"
                 className="self-photo-action"
-                onClick={capturePhoto}
-                disabled={cameraStatus !== "ready"}
+                onClick={() => uploadRef.current?.click()}
               >
-                Take a Photo
+                Upload Photo
               </button>
 
               <button
                 type="button"
                 className="self-photo-action"
-                onClick={() => uploadRef.current?.click()}
+                aria-pressed={poseOpen}
+                disabled={poses.length === 0}
+                title={poses.length === 0 ? "No pose ideas yet" : undefined}
+                onClick={() => setPoseOpen((open) => !open)}
               >
-                Upload Photo
+                Pose Ideas
               </button>
 
               <input
@@ -378,10 +402,22 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
                     key={index}
                     photo={photos[index]}
                     index={index}
+                    hint={selectedPoses[index]}
+                    onHintClick={() => setPoseOpen(true)}
                   />
                 ))}
               </div>
             </div>
+
+            {poseOpen && (
+              <PoseIdeas
+                selected={selectedPoses}
+                max={slots}
+                onToggle={togglePose}
+                onClear={() => setSelectedPoses([])}
+                onClose={() => setPoseOpen(false)}
+              />
+            )}
 
             <button
               type="button"

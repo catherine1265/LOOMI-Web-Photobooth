@@ -16,6 +16,8 @@ export default function EditorPanel({
   onTextChange,
   onPickFont,
   onPickColor,
+  savedColors,
+  onSaveColor,
 }) {
   return (
     <section className="edit-panel" aria-label="Editor">
@@ -39,7 +41,12 @@ export default function EditorPanel({
           <EffectTab photo={photo} effectId={edits.effectId} onSelect={onEffect} />
         )}
         {tab === "frame" && (
-          <FrameTab background={edits.background} onSelect={onBackground} />
+          <FrameTab
+            background={edits.background}
+            onSelect={onBackground}
+            savedColors={savedColors}
+            onSaveColor={onSaveColor}
+          />
         )}
         {tab === "sticker" && <StickerTab onAdd={onAddSticker} />}
         {tab === "text" && (

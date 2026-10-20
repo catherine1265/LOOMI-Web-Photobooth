@@ -26,52 +26,83 @@ const folderCoverFiles = import.meta.glob("../../assets/folders/*.{png,jpg,jpeg,
   import: "default",
 });
 
-function folderCover(themeId) {
+function folderCover(name) {
   const match = Object.entries(folderCoverFiles).find(
-    ([path]) => path.split("/").pop().replace(/\.[^.]+$/, "") === themeId
+    ([path]) => path.split("/").pop().replace(/\.[^.]+$/, "") === name
   );
   return match ? match[1] : null;
 }
 
-function themeFrames(themeId, starter = []) {
-  const added = Object.entries(themeFrameFiles)
-    .filter(([path]) => path.split("/").slice(-2, -1)[0] === themeId)
-    .sort(([first], [second]) => first.localeCompare(second, undefined, { numeric: true }))
-    .map(([path, src]) => ({ id: `${themeId}-${path.split("/").pop().replace(/\.[^.]+$/, "")}`, src }));
+function numberedCover(position) {
+  return folderCover(`folder${position}`);
+}
 
-  return [...added, ...starter];
+const looseFrameFiles = import.meta.glob("../../assets/frames/*.{png,jpg,jpeg,webp,svg}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+const LOOSE_THEME_ID = "basic";
+
+function fileId(path) {
+  return path.split("/").pop().replace(/\.[^.]+$/, "");
+}
+
+function sortedFrames(entries, themeId) {
+  return entries
+    .sort(([first], [second]) => first.localeCompare(second, undefined, { numeric: true }))
+    .map(([path, src]) => ({ id: `${themeId}-${fileId(path)}`, src }));
+}
+
+function themeFrames(themeId) {
+  if (themeId === LOOSE_THEME_ID) return sortedFrames(Object.entries(looseFrameFiles), themeId);
+
+  return sortedFrames(
+    Object.entries(themeFrameFiles).filter(([path]) => path.split("/").slice(-2, -1)[0] === themeId),
+    themeId
+  );
+}
+
+const KNOWN_THEMES = [
+  { id: "y2k", label: "Y2K", accent: "#d9d0dc" },
+  { id: "vintage", label: "Vintage", accent: "#f6efdf" },
+  { id: "kidcore", label: "Kidcore", accent: "#f7e3a3" },
+  { id: "soft", label: "Soft", accent: "#f5c9c2" },
+];
+
+const THEME_STYLES = {
+  abstract: { label: "Abstract", accent: "#e6dcf2" },
+  dark: { label: "Dark", accent: "#4a4458" },
+  [LOOSE_THEME_ID]: { label: "Basic", accent: "#dfe8ef" },
+};
+
+const folderIds = [
+  ...new Set(Object.keys(themeFrameFiles).map((path) => path.split("/").slice(-2, -1)[0])),
+];
+const extraIds = folderIds
+  .filter((id) => !KNOWN_THEMES.some((theme) => theme.id === id))
+  .sort();
+if (Object.keys(looseFrameFiles).length > 0) extraIds.push(LOOSE_THEME_ID);
+
+function capitalize(id) {
+  return id.charAt(0).toUpperCase() + id.slice(1);
 }
 
 export const frameThemes = [
-  {
-    id: "y2k",
-    cover: folderCover("y2k"),
-    label: "Y2K",
-    accent: "#d9d0dc",
-    frames: themeFrames("y2k"),
-  },
-  {
-    id: "vintage",
-    cover: folderCover("vintage"),
-    label: "Vintage",
-    accent: "#f6efdf",
-    frames: themeFrames("vintage"),
-  },
-  {
-    id: "kidcore",
-    cover: folderCover("kidcore"),
-    label: "Kidcore",
-    accent: "#f7e3a3",
-    frames: themeFrames("kidcore"),
-  },
-  {
-    id: "soft",
-    cover: folderCover("soft"),
-    label: "Soft",
-    accent: "#f5c9c2",
-    frames: themeFrames("soft"),
-  },
-];
+  ...KNOWN_THEMES,
+  ...extraIds.map((id) => ({
+    id,
+    label: THEME_STYLES[id]?.label ?? capitalize(id),
+    accent: THEME_STYLES[id]?.accent ?? "#dfe8ef",
+  })),
+].map((theme, index) => ({
+  ...theme,
+  cover: numberedCover(index + 1) ?? folderCover(theme.id),
+  frames: themeFrames(theme.id),
+}));
+
+export const colorFolderCover = numberedCover(frameThemes.length + 1);
 
 const stickerFiles = import.meta.glob("../../assets/stickers/*.{png,jpg,jpeg,webp,svg}", {
   eager: true,
