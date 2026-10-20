@@ -30,6 +30,7 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
   const [tab, setTab] = useState("effect");
   const [draft, setDraft] = useState("");
   const [draftColor, setDraftColor] = useState(DEFAULT_TEXT_COLOR);
+  const [savedColors, setSavedColors] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -229,6 +230,8 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
           }}
           onEffect={(effectId) => patch({ effectId })}
           onBackground={(background) => patch({ background })}
+          savedColors={savedColors}
+          onSaveColor={(hex) => setSavedColors((previous) => (previous.includes(hex) ? previous : [...previous, hex]))}
           onAddSticker={handleAddSticker}
           onTextChange={handleTextChange}
           onPickFont={handlePickFont}

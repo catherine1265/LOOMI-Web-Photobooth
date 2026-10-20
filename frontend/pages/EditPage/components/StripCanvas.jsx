@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Image as KonvaImage, Layer, Rect, Stage, Transformer } from "react-konva";
 import { effects } from "../../../config/effects.js";
 import { getSlotRects, printSpec } from "../../../printSpec.js";
-import { buildPhotoCanvas, coverCrop, loadImage, readTheme } from "../../../stripAssets.js";
+import { buildPhotoCanvas, coverCrop, loadImage, readTheme, toRgba } from "../../../stripAssets.js";
 import { StickerNode, TextNode } from "./StripItems.jsx";
 
 const ANCHORS = ["top-left", "top-right", "bottom-left", "bottom-right"];
@@ -55,7 +55,7 @@ function useBackgroundImage(background) {
 
   useEffect(() => {
     let cancelled = false;
-    if (!background) {
+    if (!background?.src) {
       setImage(null);
       return;
     }
@@ -153,7 +153,17 @@ export default function StripCanvas({
           onTouchStart={handleStagePointer}
         >
           <Layer listening={false}>
-            <Rect x={0} y={0} width={spec.width} height={spec.height} fill={theme.background} />
+            {edits.background?.type === "color" ? (
+              <Rect
+                x={0}
+                y={0}
+                width={spec.width}
+                height={spec.height}
+                fill={toRgba(edits.background.value, edits.background.alpha)}
+              />
+            ) : (
+              <Rect x={0} y={0} width={spec.width} height={spec.height} fill={theme.background} />
+            )}
             {backgroundImage && (
               <KonvaImage
                 image={backgroundImage}

@@ -253,7 +253,7 @@
   box-sizing: border-box;
 
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   overflow: hidden;
 
   border: 1.5px solid var(--self-burgundy);
@@ -286,6 +286,10 @@
 
 .self-photo-action + .self-photo-action {
   border-left: 1.5px solid var(--self-burgundy);
+}
+
+.self-photo-action[aria-pressed="true"] {
+  background: #f8e9a8;
 }
 
 .self-photo-action:hover:not(:disabled) {
@@ -424,6 +428,227 @@
 
   pointer-events: none;
   background: rgba(255, 245, 203, 0.04);
+}
+
+/* Pose idea shown in an empty slot */
+.self-photo__pose-hint {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  overflow: hidden;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.self-photo__pose-hint img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.self-photo__pose-tag {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 1px 8px;
+
+  border: 1px solid var(--self-burgundy);
+  border-radius: 999px;
+  background: rgba(255, 251, 234, 0.92);
+  color: var(--self-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.self-photo__pose-hint:hover img {
+  opacity: 1;
+}
+
+.self-photo__pose-hint:focus-visible {
+  outline: 2px solid var(--self-burgundy);
+  outline-offset: -2px;
+}
+
+/* Pose ideas chooser */
+.self-photo-pose {
+  position: absolute;
+  z-index: 3;
+  inset: 10px;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  border: 1px solid var(--self-burgundy);
+  border-radius: 14px;
+  background: var(--self-cream);
+  box-shadow: 0 3px 8px rgba(70, 36, 30, 0.25);
+}
+
+.self-photo-pose__header,
+.self-photo-pose__footer {
+  flex: none;
+  padding: 8px 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.self-photo-pose__header {
+  border-bottom: 1px solid var(--self-burgundy);
+}
+
+.self-photo-pose__footer {
+  border-top: 1px solid var(--self-burgundy);
+}
+
+.self-photo-pose__title {
+  margin: 0;
+  flex: 1;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.self-photo-pose__count {
+  flex: 1;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.self-photo-pose__icon-button {
+  width: 26px;
+  height: 26px;
+  padding: 5px;
+
+  border: 1px solid var(--self-burgundy);
+  border-radius: 50%;
+  background: #fffbea;
+  color: var(--self-burgundy);
+
+  cursor: pointer;
+}
+
+.self-photo-pose__icon-button svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.self-photo-pose__action {
+  height: 26px;
+  padding: 0 12px;
+
+  border: 1px solid var(--self-burgundy);
+  border-radius: 999px;
+  background: #fffbea;
+  color: var(--self-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.self-photo-pose__action--primary {
+  background: var(--self-burgundy);
+  color: #fff4d4;
+}
+
+.self-photo-pose__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.self-photo-pose__grid {
+  flex: 1;
+  min-height: 0;
+  padding: 10px;
+  overflow-y: auto;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 72px;
+  gap: 8px;
+}
+
+.self-photo-pose__item {
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+
+  border: 1px solid var(--self-burgundy);
+  border-radius: 8px;
+  background: #fffbea;
+
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.self-photo-pose__item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(70, 36, 30, 0.25);
+}
+
+.self-photo-pose__item[aria-pressed="true"] {
+  outline: 2px solid var(--self-burgundy);
+  outline-offset: -2px;
+}
+
+.self-photo-pose__item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.self-photo-pose__order {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: var(--self-burgundy);
+  color: #fff4d4;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.self-photo-pose__empty {
+  margin: 0;
+  padding: 24px 12px;
+
+  font-size: 14px;
+  text-align: center;
+}
+
+.self-photo-pose button:focus-visible {
+  outline: 2px solid var(--self-burgundy);
+  outline-offset: 2px;
 }
 
 /* Retake button */
