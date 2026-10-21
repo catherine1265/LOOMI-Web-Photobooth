@@ -20,12 +20,17 @@ function persist() {
   try {
     if (session) window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     else window.sessionStorage.removeItem(STORAGE_KEY);
-  } catch {}
+    return true;
+  } catch {
+    try { window.sessionStorage.removeItem(STORAGE_KEY); } catch {}
+    return false;
+  }
 }
 
 function emit() {
-  persist();
+  const persisted = persist();
   listeners.forEach((listener) => listener());
+  return persisted;
 }
 
 function subscribe(listener) {
@@ -39,7 +44,7 @@ export function getPhotoSession() {
 
 export function setPhotoSession(next) {
   session = next;
-  emit();
+  return emit();
 }
 
 export function clearPhotoSession() {

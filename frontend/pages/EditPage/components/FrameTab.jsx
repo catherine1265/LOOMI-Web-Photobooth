@@ -1,12 +1,17 @@
 import { useRef, useState } from "react";
 import { frameThemes, validateImage } from "../editorData.js";
+import ColorFolder from "./ColorFolder.jsx";
+import ColorPanel from "./ColorPanel.jsx";
 
-export default function FrameTab({ background, onSelect }) {
+const COLOR_VIEW = "color";
+
+export default function FrameTab({ background, onSelect, savedColors, onSaveColor }) {
   const inputRef = useRef(null);
   const [error, setError] = useState("");
   const [themeId, setThemeId] = useState(null);
 
   const theme = frameThemes.find((item) => item.id === themeId);
+  const colorOpen = themeId === COLOR_VIEW;
 
   function handleUpload(event) {
     const file = event.target.files?.[0];
@@ -15,12 +20,43 @@ export default function FrameTab({ background, onSelect }) {
 
     const problem = validateImage(file);
     setError(problem);
-    if (!problem) onSelect({ src: URL.createObjectURL(file) });
+    if (!problem) onSelect({ type: "image", src: URL.createObjectURL(file) });
   }
 
   return (
     <div className="edit-frames">
-      {theme ? (
+      {colorOpen ? (
+        <>
+          <div className="edit-frames__header">
+            <button
+              type="button"
+              className="edit-frames__back"
+              aria-label="Back to frame folders"
+              onClick={() => setThemeId(null)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="m15 5-7 7 7 7"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <p className="edit-frames__title">Color</p>
+          </div>
+
+          <div className="edit-frames__box">
+            <ColorPanel
+              background={background}
+              onChange={onSelect}
+              savedColors={savedColors}
+              onSaveColor={onSaveColor}
+            />
+          </div>
+        </>
+      ) : theme ? (
         <>
           <div className="edit-frames__header">
             <button
@@ -56,7 +92,7 @@ export default function FrameTab({ background, onSelect }) {
                   className="edit-frames__option"
                   aria-pressed={background?.src === frame.src}
                   aria-label={`${theme.label} ${frame.id} frame`}
-                  onClick={() => onSelect(background?.src === frame.src ? null : { src: frame.src })}
+                  onClick={() => onSelect(background?.src === frame.src ? null : { type: "image", src: frame.src })}
                 >
                   <span
                     className="edit-frames__option-image"
@@ -92,6 +128,7 @@ export default function FrameTab({ background, onSelect }) {
               </span>
             </button>
           ))}
+          <ColorFolder background={background} onOpen={() => setThemeId(COLOR_VIEW)} />
         </div>
       )}
 

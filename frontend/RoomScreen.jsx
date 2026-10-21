@@ -7,10 +7,11 @@ import { moveLayer } from "../lib/layers.js";
 import { colorFor, createCompositor } from "./compositor.js";
 import { RoomClient, loadSession } from "./roomClient.js";
 import { CenteredMessage, CopyButton, Link, linkClass, navigate } from "./ui.jsx";
+import CaptureBooth from "./CaptureBooth.jsx";
 
 // ---- Room screen -----------------------------------------------------------------------
 
-export function RoomScreen({ code }) {
+export function RoomScreen({ code, frameType, onEdit }) {
   const [session] = useState(() => loadSession(code));
   if (!session) {
     return (
@@ -22,10 +23,10 @@ export function RoomScreen({ code }) {
       </CenteredMessage>
     );
   }
-  return <ConnectedRoom session={session} />;
+  return <ConnectedRoom session={session} frameType={frameType} onEdit={onEdit} />;
 }
 
-function ConnectedRoom({ session }) {
+function ConnectedRoom({ session, frameType, onEdit }) {
   const [client, setClient] = useState(null);
 
   useEffect(() => {
@@ -38,7 +39,7 @@ function ConnectedRoom({ session }) {
   }, [session]);
 
   if (!client) return <CenteredMessage>Connecting…</CenteredMessage>;
-  return <RoomView client={client} />;
+  return <RoomView client={client} frameType={frameType} onEdit={onEdit} />;
 }
 
 const CONNECTION_STATUS = {
@@ -48,7 +49,8 @@ const CONNECTION_STATUS = {
   disconnected: { label: "Disconnected", dot: "bg-red-500" },
 };
 
-function RoomView({ client }) {
+function RoomView({ client, frameType, onEdit }) {
+  const canvasRef = useRef(null);
   const snap = useSyncExternalStore(client.subscribe, client.getSnapshot);
   const [toast, setToast] = useState(null);
   const [leaving, setLeaving] = useState(false);
@@ -124,7 +126,9 @@ function RoomView({ client }) {
 
       <main className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <section aria-label="Preview" className="flex flex-col gap-2">
-          <PreviewCanvas client={client} stack={stack} />
+          <CaptureBooth client={client} snap={snap} initialFrameType={frameType} canvasRef={canvasRef} onEdit={onEdit}>
+            <PreviewCanvas client={client} stack={stack} canvasRef={canvasRef} />
+          </CaptureBooth>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Preview of the combined image: the bottom layer fills the background, the other layers are drawn on top in stack
             order.
@@ -165,8 +169,7 @@ function RoomView({ client }) {
 
 const FRAME_INTERVAL_MS = 1000 / 30;
 
-function PreviewCanvas({ client, stack }) {
-  const canvasRef = useRef(null);
+function PreviewCanvas({ client, stack, canvasRef }) {
   const stackRef = useRef(stack);
 
   useEffect(() => {
