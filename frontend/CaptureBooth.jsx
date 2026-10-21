@@ -4,13 +4,19 @@ import { getPhotoSession, setPhotoSession } from "./photoStore.js";
 import { getSlotRects, printSpec } from "./printSpec.js";
 import { buildPhotoCanvas, loadImage } from "./stripAssets.js";
 import "./captureBooth.css";
+import { photoTypes } from "./pages/PhotoType/components/FrameType/FrameType.jsx";
+import PoseIdeas from "./pages/PhotoType/components/SelfPhoto/PoseIdeas.jsx";
+import { poses } from "./pages/PhotoType/components/SelfPhoto/poses.js";
+import Sparkle from "./pages/PhotoType/components/shared/Sparkle.jsx";
+import { SlotContent } from "./pages/PhotoType/components/shared/SlotContent.jsx";
+import PhotoStripPanel from "./pages/PhotoType/components/shared/PhotoStripPanel.jsx";
 
 function readDraft(code) {
   const draft = getPhotoSession();
   return draft?.source === "collab" && draft.roomCode === code && Object.hasOwn(CAPTURE_LAYOUTS, draft.frameType) ? draft : null;
 }
 
-export default function CaptureBooth({ client, snap, initialFrameType, canvasRef, onEdit, children }) {
+export default function CaptureBooth({ client, snap, initialFrameType, canvasRef, onEdit, layers, children }) {
   const [draft] = useState(() => readDraft(client.session.code));
   const [frameType, setFrameType] = useState(draft?.frameType || (Object.hasOwn(CAPTURE_LAYOUTS, initialFrameType) ? initialFrameType : "1x3"));
   const [photos, setPhotos] = useState(draft?.photos || []);
@@ -19,6 +25,8 @@ export default function CaptureBooth({ client, snap, initialFrameType, canvasRef
   const [storageWarning, setStorageWarning] = useState("");
   const [clock, setClock] = useState(Date.now());
   const [flash, setFlash] = useState(false);
+  const [poseOpen, setPoseOpen] = useState(false);
+  const [selectedPoses, setSelectedPoses] = useState([]);
   const photosRef = useRef(photos);
   const layoutRef = useRef(frameType);
   const sequence = useRef([]);
@@ -204,51 +212,115 @@ export default function CaptureBooth({ client, snap, initialFrameType, canvasRef
     finally { if (mounted.current) setBusy(false); }
   }
 
-  const spec = printSpec[frameType];
+  const frame = photoTypes.find((type) => type.id === frameType);
+  const photoAt = (index) => photos.find((photo) => photo.slotIndex === index)?.src;
+
+  function togglePose(source) {
+    setSelectedPoses((previous) => {
+      if (previous.includes(source)) return previous.filter((item) => item !== source);
+      return previous.length < slots ? [...previous, source] : previous;
+    });
+  }
+
   return (
-    <div className="capture-booth">
-      <div className="capture-booth__preview">
-        {children}
-        {counting && <div className="capture-booth__countdown" role="status" aria-live="polite">
-          <span>Photo {capture.slotIndex + 1} of {CAPTURE_LAYOUTS[capture.frameType]}</span>
-          <strong>{remaining > 0 ? Math.ceil(remaining / 1000) : "Smile!"}</strong>
-        </div>}
-        {flash && <div className="capture-booth__flash" aria-hidden="true" />}
+    <div className="room-stage">
+      <div className="room-main">
+        {(error || storageWarning || (isHost && !snap.cameraOn)) && (
+          <div className="room-banners">
+            {isHost && !snap.cameraOn && <p className="room-banner" role="status">Turn on your camera to take photos.</p>}
+            {error && <p className="room-banner" role="alert">{error}</p>}
+            {storageWarning && <p className="room-banner" role="status">{storageWarning}</p>}
+          </div>
+        )}
+
+        <section className="self-photo-camera-card room-camera-card">
+          <Sparkle className="self-photo__sparkle--camera" />
+
+          <div className="capture-booth__preview room-camera-viewport">
+            {children}
+            {counting && <div className="capture-booth__countdown" role="status" aria-live="polite">
+              <span>Photo {capture.slotIndex + 1} of {CAPTURE_LAYOUTS[capture.frameType]}</span>
+              <strong>{remaining > 0 ? Math.ceil(remaining / 1000) : "Smile!"}</strong>
+            </div>}
+            {flash && <div className="capture-booth__flash" aria-hidden="true" />}
+          </div>
+
+          <Sparkle className="self-photo__sparkle--camera-bottom" />
+        </section>
+
+        <div className="room-bottom">
+          {layers}
+
+          <div className="room-actions">
+            {isHost && (
+              <>
+                <label className="room-select">
+                  Photo layout
+                  <select value={frameType} disabled={locked || photos.length > 0} onChange={(e) => changeLayout(e.target.value)}>
+                    {Object.keys(CAPTURE_LAYOUTS).map((layout) => <option key={layout} value={layout}>{layout}</option>)}
+                  </select>
+                </label>
+                <button type="button" className="room-pill room-pill--primary" disabled={!ready || locked || full} onClick={beginSequence}>
+                  {busy ? "Please wait…" : counting ? "Taking photos…" : photos.length ? "Continue capture" : "Take photos"}
+                </button>
+                {counting && <button type="button" className="room-pill" onClick={() => void cancel()} disabled={busy}>Cancel countdown</button>}
+                {photos.length > 0 && <button type="button" className="room-pill" disabled={locked} onClick={() => persist([])}>Start over</button>}
+                <button type="button" className="room-pill" disabled title="Upload is not available in the room yet">Upload</button>
+              </>
+            )}
+            <button
+              type="button"
+              className="room-pill"
+              aria-pressed={poseOpen}
+              disabled={poses.length === 0}
+              title={poses.length === 0 ? "No pose ideas yet" : undefined}
+              onClick={() => setPoseOpen((open) => !open)}
+            >
+              Pose Ideas
+            </button>
+          </div>
+
+          <p className="capture-booth__hint">
+            {isHost
+              ? `${photos.length} of ${slots} photos ready. Each photo has a 3-second countdown. The host saves the combined result.`
+              : "The host controls capture. Get ready when the countdown appears! Photos are saved on the host\u2019s device."}
+          </p>
+        </div>
       </div>
-      {isHost ? <>
-        <div className="capture-booth__controls">
-          <label>Photo layout <select value={frameType} disabled={locked || photos.length > 0} onChange={(e) => changeLayout(e.target.value)}>
-            {Object.keys(CAPTURE_LAYOUTS).map((layout) => <option key={layout} value={layout}>{layout}</option>)}
-          </select></label>
-          <button type="button" className="capture-booth__primary" disabled={!ready || locked || full} onClick={beginSequence}>
-            {busy ? "Please wait…" : counting ? "Taking photos…" : photos.length ? "Continue capture" : "Take photos"}
-          </button>
-          {counting && <button type="button" onClick={() => void cancel()} disabled={busy}>Cancel countdown</button>}
-          {photos.length > 0 && <button type="button" disabled={locked} onClick={() => persist([])}>Start over</button>}
-        </div>
-        <p className="capture-booth__hint">{photos.length} of {slots} photos ready. Each photo has a 3-second countdown. The host saves the combined result.</p>
-        {!snap.cameraOn && <p role="status">Turn on your camera to take photos.</p>}
-      </> : <p className="capture-booth__hint">The host controls capture. Get ready when the countdown appears! Photos are saved on the host’s device.</p>}
-      {error && <p className="capture-booth__error" role="alert">{error}</p>}
-      {storageWarning && <p className="capture-booth__error" role="status">{storageWarning}</p>}
-      {photos.length > 0 && <section className="capture-booth__review" aria-label="Captured photo strip">
-        <div className="capture-booth__strip" style={{ aspectRatio: `${spec.width} / ${spec.height}` }}>
-          {getSlotRects(spec).map((rect, index) => {
-            const photo = photos.find((p) => p.slotIndex === index);
-            return <button key={index} type="button" disabled={!isHost || locked || !ready}
+
+      <div className="room-side">
+        <PhotoStripPanel
+          frame={frame}
+          renderSlot={(index) => (
+            <button
+              key={index}
+              type="button"
+              disabled={!isHost || locked || !ready}
               onClick={() => { sequence.current = []; void start(index); }}
-              aria-label={photo ? `Retake photo ${index + 1}` : `Take photo ${index + 1}`}
-              className="capture-booth__slot" style={{ left: `${rect.x / spec.width * 100}%`, top: `${rect.y / spec.height * 100}%`, width: `${rect.width / spec.width * 100}%`, height: `${rect.height / spec.height * 100}%` }}>
-              {photo ? <img src={photo.src} alt={`Combined photo ${index + 1}`} /> : <span>Photo {index + 1}</span>}
-            </button>;
-          })}
+              aria-label={photoAt(index) ? `Retake photo ${index + 1}` : `Take photo ${index + 1}`}
+              className="self-photo__result-image room-slot"
+            >
+              <SlotContent photo={photoAt(index)} index={index} hint={selectedPoses[index]} />
+            </button>
+          )}
+        >
+          {poseOpen && (
+            <PoseIdeas
+              selected={selectedPoses}
+              max={slots}
+              onToggle={togglePose}
+              onClear={() => setSelectedPoses([])}
+              onClose={() => setPoseOpen(false)}
+            />
+          )}
+        </PhotoStripPanel>
+
+        <div className="room-strip-actions">
+          <p className="room-strip-actions__hint">Select a photo to retake that slot.</p>
+          <button type="button" className="room-pill" disabled={!full || locked} onClick={() => void downloadStrip()}>Download strip</button>
+          <button type="button" className="room-pill room-pill--primary" disabled={!full || locked} onClick={() => { persist(photos); onEdit(); }}>Continue to edit</button>
         </div>
-        <div className="capture-booth__review-actions">
-          <p>Select a photo to retake that slot.</p>
-          <button type="button" disabled={!full || locked} onClick={() => void downloadStrip()}>Download strip</button>
-          <button type="button" className="capture-booth__primary" disabled={!full || locked} onClick={() => { persist(photos); onEdit(); }}>Continue to edit</button>
-        </div>
-      </section>}
+      </div>
     </div>
   );
 }

@@ -29,7 +29,7 @@ export const primaryButton =
   "w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60";
 export const linkClass = "mt-4 inline-block font-semibold text-indigo-600 hover:underline dark:text-indigo-400";
 
-async function copyText(text) {
+export async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
     return true;

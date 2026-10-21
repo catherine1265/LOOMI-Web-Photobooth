@@ -1,13 +1,15 @@
 // Room page (/room/:code): header, combined preview canvas and the layer panel.
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
-import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, horizontalListSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { moveLayer } from "../lib/layers.js";
 import { colorFor, createCompositor } from "./compositor.js";
 import { RoomClient, loadSession } from "./roomClient.js";
-import { CenteredMessage, CopyButton, Link, linkClass, navigate } from "./ui.jsx";
+import { CenteredMessage, Link, copyText, linkClass, navigate } from "./ui.jsx";
 import CaptureBooth from "./CaptureBooth.jsx";
+import Navbar from "./pages/Navbar/tampilan/Navbar.jsx";
+import "./pages/PhotoType/components/SelfPhoto/style/SelfPhoto.css";
 
 // ---- Room screen -----------------------------------------------------------------------
 
@@ -43,11 +45,29 @@ function ConnectedRoom({ session, frameType, onEdit }) {
 }
 
 const CONNECTION_STATUS = {
-  connecting: { label: "Connecting", dot: "bg-amber-400 animate-pulse" },
-  connected: { label: "Connected", dot: "bg-emerald-500" },
-  reconnecting: { label: "Reconnecting", dot: "bg-amber-500 animate-pulse" },
-  disconnected: { label: "Disconnected", dot: "bg-red-500" },
+  connecting: { label: "Connecting" },
+  connected: { label: "Connected" },
+  reconnecting: { label: "Reconnecting" },
+  disconnected: { label: "Disconnected" },
 };
+
+function CopyCodeButton({ text }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className="room-pill"
+      onClick={async () => {
+        if (await copyText(text)) {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        }
+      }}
+    >
+      <span aria-live="polite">{copied ? "Copied!" : "Copy code"}</span>
+    </button>
+  );
+}
 
 function RoomView({ client, frameType, onEdit }) {
   const canvasRef = useRef(null);
@@ -84,84 +104,75 @@ function RoomView({ client, frameType, onEdit }) {
   }
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:py-6">
-      <header className="flex flex-wrap items-center gap-x-4 gap-y-3">
-        <div className="mr-auto">
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Meeting code</p>
-          <div className="flex items-center gap-2">
-            <h1 className="font-mono text-2xl font-bold tracking-[0.15em]">{session.code}</h1>
-            <CopyButton text={session.code} label="Copy code" className="py-1 text-xs" />
-          </div>
-        </div>
-        <span role="status" className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-sm dark:border-slate-800">
-          <span className={`h-2.5 w-2.5 rounded-full ${status.dot}`} aria-hidden="true" />
-          {status.label}
-        </span>
-        {isHost && (
-          <span className="rounded-full bg-indigo-600 px-3 py-1 text-sm font-semibold text-white">You are the host</span>
-        )}
-        <button
-          type="button"
-          onClick={() => client.setCameraEnabled(!snap.cameraOn)}
-          aria-pressed={!snap.cameraOn}
-          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-        >
-          {snap.cameraOn ? "Turn camera off" : "Turn camera on"}
-        </button>
-        <button
-          type="button"
-          onClick={leave}
-          disabled={leaving}
-          className="rounded-lg bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-60"
-        >
-          {leaving ? "Leaving…" : "Leave"}
-        </button>
-      </header>
+    <main className="self-photo-page room-photo-page">
+      <Navbar />
 
-      {snap.notice && (
-        <p role="status" className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
-          {snap.notice}
-        </p>
-      )}
-
-      <main className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-        <section aria-label="Preview" className="flex flex-col gap-2">
-          <CaptureBooth client={client} snap={snap} initialFrameType={frameType} canvasRef={canvasRef} onEdit={onEdit}>
-            <PreviewCanvas client={client} stack={stack} canvasRef={canvasRef} />
-          </CaptureBooth>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Preview of the combined image: the bottom layer fills the background, the other layers are drawn on top in stack
-            order.
-          </p>
-        </section>
-
-        <aside className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-100/60 p-3 dark:border-slate-800 dark:bg-slate-900/60">
-          {state ? (
-            <LayerPanel
-              stack={stack}
-              hostIdentity={state.hostIdentity}
-              localIdentity={session.identity}
-              onReorder={(order) => client.reorder(order)}
-              onTransferHost={(identity) => client.transferHost(identity)}
-              onError={setToast}
-            />
-          ) : (
-            <p className="p-2 text-sm text-slate-500">Loading layers…</p>
-          )}
-        </aside>
-      </main>
-
-      <div aria-live="assertive" className="pointer-events-none fixed inset-x-0 bottom-4 flex justify-center px-4">
-        {toast && (
-          <p
-            role="alert"
-            className="pointer-events-auto rounded-xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lg dark:bg-white dark:text-slate-900"
+      <section className="self-photo-layout room-photo-layout">
+        <header className="room-topbar">
+          <span className="room-chip room-chip--code">
+            Meeting code <strong className="room-code">{session.code}</strong>
+          </span>
+          <CopyCodeButton text={session.code} />
+          <span role="status" className="room-chip">
+            <span className={`room-dot room-dot--${snap.connection}`} aria-hidden="true" />
+            {status.label}
+          </span>
+          {isHost && <span className="room-chip room-chip--solid">You are the host</span>}
+          <button
+            type="button"
+            onClick={() => client.setCameraEnabled(!snap.cameraOn)}
+            aria-pressed={!snap.cameraOn}
+            className="room-pill room-topbar__push"
           >
+            {snap.cameraOn ? "Turn camera off" : "Turn camera on"}
+          </button>
+          <button type="button" onClick={leave} disabled={leaving} className="room-pill room-pill--primary">
+            {leaving ? "Leaving…" : "Leave"}
+          </button>
+        </header>
+
+        {snap.notice && (
+          <p role="status" className="room-banner">
+            {snap.notice}
+          </p>
+        )}
+
+        <CaptureBooth
+          client={client}
+          snap={snap}
+          initialFrameType={frameType}
+          canvasRef={canvasRef}
+          onEdit={onEdit}
+          layers={
+            state ? (
+              <LayerPanel
+                stack={stack}
+                hostIdentity={state.hostIdentity}
+                localIdentity={session.identity}
+                onReorder={(order) => client.reorder(order)}
+                onTransferHost={(identity) => client.transferHost(identity)}
+                onError={setToast}
+              />
+            ) : (
+              <p className="room-layers__loading">Loading layers…</p>
+            )
+          }
+        >
+          <PreviewCanvas client={client} stack={stack} canvasRef={canvasRef} />
+        </CaptureBooth>
+        <p className="room-sr-only">
+          Preview of the combined image: the bottom layer fills the background, the other layers are drawn on top in stack order.
+        </p>
+      </section>
+
+      <div aria-live="assertive" className="room-toast-area">
+        {toast && (
+          <p role="alert" className="room-toast">
             {toast}
           </p>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -211,7 +222,7 @@ function PreviewCanvas({ client, stack, canvasRef }) {
       height={720}
       role="img"
       aria-label={description}
-      className="aspect-video w-full rounded-2xl bg-slate-900 shadow-lg"
+      className="room-canvas"
     />
   );
 }
@@ -278,14 +289,14 @@ function LayerPanel({ stack, hostIdentity, localIdentity, onReorder, onTransferH
   }
 
   return (
-    <section aria-labelledby="layers-title" className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 id="layers-title" className="text-base font-semibold">
-          Layers <span className="font-normal text-slate-500">· {items.length} participant{items.length === 1 ? "" : "s"}</span>
+    <section aria-labelledby="layers-title" className="room-layers">
+      <div className="room-layers__head">
+        <h2 id="layers-title" className="room-layers__title">
+          Layers <span>· {items.length} participant{items.length === 1 ? "" : "s"}</span>
         </h2>
-        <span className="text-xs text-slate-500 dark:text-slate-400">{isHost ? "Drag to reorder" : "Set by the host"}</span>
+        <span className="room-layers__hint">{isHost ? "Drag to reorder" : "Set by the host"}</span>
       </div>
-      <p id="layers-help" className="sr-only">
+      <p id="layers-help" className="room-sr-only">
         The first layer is drawn on top. The last layer is the background.
         {isHost && " To reorder with the keyboard, focus a drag handle, press Space, use the arrow keys, then press Space again."}
       </p>
@@ -303,8 +314,8 @@ function LayerPanel({ stack, hostIdentity, localIdentity, onReorder, onTransferH
           },
         }}
       >
-        <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-          <ol aria-describedby="layers-help" className="flex flex-col gap-2">
+        <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
+          <ol aria-describedby="layers-help" className="room-layers__row">
             {items.map((entry, index) => (
               <LayerRow
                 key={entry.identity}
@@ -338,11 +349,7 @@ function LayerRow({ entry, index, count, isHost, isRowHost, isYou, onMove, onMak
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`relative flex items-center gap-2 rounded-xl border bg-white p-2 pr-3 dark:bg-slate-900 ${
-        isDragging
-          ? "z-10 scale-[1.02] border-indigo-500 shadow-xl ring-2 ring-indigo-500/40"
-          : "border-slate-200 shadow-sm dark:border-slate-800"
-      } ${absent ? "opacity-60" : ""}`}
+      className={`room-layer${isDragging ? " room-layer--dragging" : ""}${absent ? " room-layer--absent" : ""}`}
     >
       {isHost && (
         <button
@@ -351,34 +358,32 @@ function LayerRow({ entry, index, count, isHost, isRowHost, isYou, onMove, onMak
           {...attributes}
           {...listeners}
           aria-label={`Reorder ${entry.name}, ${describePosition(index, count)}`}
-          className={`flex h-9 w-7 shrink-0 touch-none items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 ${
-            isDragging ? "cursor-grabbing" : "cursor-grab"
-          }`}
+          className="room-layer__grip"
         >
           <svg width="12" height="18" viewBox="0 0 12 18" aria-hidden="true" fill="currentColor">
             {[3, 9, 15].flatMap((y) => [<circle key={`a${y}`} cx="3" cy={y} r="1.6" />, <circle key={`b${y}`} cx="9" cy={y} r="1.6" />])}
           </svg>
         </button>
       )}
-      <span className="w-5 shrink-0 text-center text-xs tabular-nums text-slate-400" aria-hidden="true">
+      <span className="room-layer__index" aria-hidden="true">
         {index + 1}
       </span>
-      <span className="h-8 w-8 shrink-0 rounded-lg" style={{ background: colorFor(entry.identity) }} aria-hidden="true" />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="truncate font-medium">{entry.name}</span>
-          {isYou && <span className="text-xs text-slate-500">(you)</span>}
+      <span className="room-layer__dot" style={{ background: colorFor(entry.identity) }} aria-hidden="true" />
+      <div className="room-layer__body">
+        <div className="room-layer__name">
+          <span>{entry.name}</span>
+          {isYou && <span className="room-layer__you">(you)</span>}
         </div>
-        <div className="mt-0.5 flex flex-wrap items-center gap-1">
-          {isTop && <Tag tone="amber">Top</Tag>}
-          {isBottom && <Tag tone="sky">Background</Tag>}
-          {isRowHost && <Tag tone="indigo">Host</Tag>}
-          {absent && <Tag tone="slate">Reconnecting…</Tag>}
+        <div className="room-layer__tags">
+          {isTop && <Tag>Top</Tag>}
+          {isBottom && <Tag>Background</Tag>}
+          {isRowHost && <Tag solid>Host</Tag>}
+          {absent && <Tag>Reconnecting…</Tag>}
           {isHost && !isRowHost && !absent && (
             <button
               type="button"
               onClick={() => onMakeHost(entry.identity)}
-              className="rounded border border-slate-300 px-1.5 py-px text-[11px] font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="room-tag room-tag--button"
               aria-label={`Make ${entry.name} the host`}
             >
               Make host
@@ -387,7 +392,7 @@ function LayerRow({ entry, index, count, isHost, isRowHost, isYou, onMove, onMak
         </div>
       </div>
       {isHost && (
-        <div className="flex shrink-0 items-center">
+        <div className="room-layer__moves">
           <IconButton label={`Move ${entry.name} up`} disabled={isTop} onClick={() => onMove(index, index - 1)}>
             ↑
           </IconButton>
@@ -400,15 +405,8 @@ function LayerRow({ entry, index, count, isHost, isRowHost, isYou, onMove, onMak
   );
 }
 
-const TAG_TONES = {
-  amber: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200",
-  sky: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-200",
-  indigo: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200",
-  slate: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-};
-
-function Tag({ tone, children }) {
-  return <span className={`rounded px-1.5 py-0.5 text-[11px] font-semibold ${TAG_TONES[tone]}`}>{children}</span>;
+function Tag({ solid, children }) {
+  return <span className={`room-tag${solid ? " room-tag--solid" : ""}`}>{children}</span>;
 }
 
 function IconButton({ label, disabled, onClick, children }) {
@@ -419,7 +417,7 @@ function IconButton({ label, disabled, onClick, children }) {
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className="h-8 w-8 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent dark:hover:bg-slate-800 dark:hover:text-white"
+      className="room-layer__move"
     >
       {children}
     </button>

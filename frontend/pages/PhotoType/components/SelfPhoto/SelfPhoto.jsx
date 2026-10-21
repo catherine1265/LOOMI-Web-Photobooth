@@ -7,24 +7,9 @@ import { saveSoloSession } from "../../../../photoStore.js";
 import { getSlotRatio } from "../../../../printSpec.js";
 import { poses } from "./poses.js";
 import PoseIdeas from "./PoseIdeas.jsx";
-
-function Sparkle({ className = "" }) {
-  return (
-    <svg
-      className={`self-photo__sparkle ${className}`}
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-    >
-      <path
-        d="M50 2 L53.8 40.8 L71.2 28.8 L59.2 46.2 L98 50 L59.2 53.8 L71.2 71.2 L53.8 59.2 L50 98 L46.2 59.2 L28.8 71.2 L40.8 53.8 L2 50 L40.8 46.2 L28.8 28.8 L46.2 40.8Z"
-        fill="#f7e9b0"
-        stroke="#652b2b"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+import Sparkle from "../shared/Sparkle.jsx";
+import { BlurredPlaceholder } from "../shared/SlotContent.jsx";
+import PhotoStripPanel from "../shared/PhotoStripPanel.jsx";
 
 function CameraIcon() {
   return (
@@ -56,38 +41,6 @@ function RetakeIcon() {
         strokeLinejoin="round"
       />
     </svg>
-  );
-}
-
-function BlurredPlaceholder({ photo, index, hint, onHintClick }) {
-  return (
-    <div className="self-photo__result-image">
-      {!photo && hint ? (
-        <button
-          type="button"
-          className="self-photo__pose-hint"
-          onClick={onHintClick}
-          aria-label={`Pose idea for photo ${index + 1}. Click to change the pose ideas`}
-          title="Click to change the pose ideas"
-        >
-          <img src={hint} alt="" loading="lazy" />
-          <span className="self-photo__pose-tag">Pose</span>
-        </button>
-      ) : photo ? (
-        <img
-          src={photo}
-          alt={`Photo result ${index + 1}`}
-        />
-      ) : (
-        <div
-          className={`self-photo__mosaic self-photo__mosaic--${index + 1}`}
-          aria-label="Photo result placeholder"
-          role="img"
-        />
-      )}
-
-      <span className="self-photo__result-overlay" />
-    </div>
   );
 }
 
@@ -433,30 +386,18 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
           </div>
 
           {/* RIGHT: PHOTO RESULTS */}
-          <section
-            className={`self-photo-results self-photo-results--${frame.id}`}
-            aria-label="Photo results"
+          <PhotoStripPanel
+            frame={frame}
+            renderSlot={(index) => (
+              <BlurredPlaceholder
+                key={index}
+                photo={photos[index]?.src}
+                index={index}
+                hint={selectedPoses[index]}
+                onHintClick={() => setPoseOpen(true)}
+              />
+            )}
           >
-            <div className="self-photo-results-list">
-              <div
-                className={`self-photo-frame self-photo-frame--${frame.id}`}
-                style={{
-                  "--columns": frame.columns,
-                  "--rows": slots / frame.columns,
-                }}
-              >
-                {Array.from({ length: slots }, (_, index) => (
-                  <BlurredPlaceholder
-                    key={index}
-                    photo={photos[index]?.src}
-                    index={index}
-                    hint={selectedPoses[index]}
-                    onHintClick={() => setPoseOpen(true)}
-                  />
-                ))}
-              </div>
-            </div>
-
             {poseOpen && (
               <PoseIdeas
                 selected={selectedPoses}
@@ -494,7 +435,7 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
                 Back
               </button>
             )}
-          </section>
+          </PhotoStripPanel>
         </div>
 
         {doneMessage && (
