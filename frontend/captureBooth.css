@@ -1,0 +1,24 @@
+.capture-booth { display: flex; flex-direction: column; gap: 12px; }
+.capture-booth__preview { position: relative; overflow: hidden; border-radius: 16px; }
+.capture-booth__countdown { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: white; background: rgb(15 23 42 / 30%); pointer-events: none; text-shadow: 0 2px 10px #000; }
+.capture-booth__countdown strong { font-size: clamp(48px, 12vw, 112px); line-height: 1.1; }
+.capture-booth__countdown span { font-weight: 600; }
+.capture-booth__flash { position: absolute; inset: 0; background: rgb(255 255 255 / 75%); pointer-events: none; }
+.capture-booth__controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.capture-booth__controls label { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.capture-booth button, .capture-booth select { border: 1px solid #cbd5e1; border-radius: 10px; padding: 9px 14px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.capture-booth select { color: #0f172a; background: white; }
+.capture-booth button:hover:enabled { background: #e2e8f0; color: #0f172a; }
+.capture-booth button:focus-visible, .capture-booth select:focus-visible { outline: 3px solid #818cf8; outline-offset: 3px; }
+.capture-booth button:disabled { opacity: .5; cursor: not-allowed; }
+.capture-booth button.capture-booth__primary { color: white; background: #4f46e5; border-color: #4f46e5; }
+.capture-booth button.capture-booth__primary:hover:enabled { background: #4338ca; color: white; }
+.capture-booth__hint, .capture-booth__review-actions p { font-size: 13px; color: #64748b; }
+.capture-booth__error { padding: 10px 14px; color: #991b1b; background: #fef2f2; border-radius: 10px; font-size: 14px; }
+.capture-booth__review { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 20px; border: 1px solid #cbd5e1; border-radius: 16px; }
+.capture-booth__strip { position: relative; flex: 0 0 auto; width: min(180px, 100%); background: #fff5cb; box-shadow: 0 4px 12px #0002; }
+.capture-booth button.capture-booth__slot { position: absolute; padding: 0; overflow: hidden; border: 1px dashed #b8aa87; border-radius: 6px; background: #f1ead4; color: #652b2b; }
+.capture-booth button.capture-booth__slot:disabled { opacity: 1; }
+.capture-booth__slot img { width: 100%; height: 100%; object-fit: contain; }
+.capture-booth__review-actions { display: flex; flex: 1 1 160px; flex-direction: column; align-items: flex-start; gap: 12px; }
+@media (prefers-reduced-motion: reduce) { .capture-booth__flash { display: none; } }

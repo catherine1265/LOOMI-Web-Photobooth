@@ -30,7 +30,9 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
   const [tab, setTab] = useState("effect");
   const [draft, setDraft] = useState("");
   const [draftColor, setDraftColor] = useState(DEFAULT_TEXT_COLOR);
+  const [savedColors, setSavedColors] = useState([]);
   const [error, setError] = useState("");
+  const [exportReady, setExportReady] = useState(false);
 
   useEffect(() => {
     if (!session) onEmpty();
@@ -167,7 +169,7 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
     }
 
     const frameType = session.frameType;
-    clearPhotoSession();
+    if (session.source !== "collab") clearPhotoSession();
     onRetake(frameType);
   }
 
@@ -175,7 +177,7 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
     const stage = stageRef.current;
     const transformer = transformerRef.current;
 
-    if (!stage) {
+    if (!stage || !exportReady) {
       setError("Unable to generate your photo. Please try again.");
       return;
     }
@@ -215,6 +217,7 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
           onChange={updateItem}
           stageRef={stageRef}
           transformerRef={transformerRef}
+          onReady={setExportReady}
         />
 
         <EditorPanel
@@ -229,6 +232,8 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
           }}
           onEffect={(effectId) => patch({ effectId })}
           onBackground={(background) => patch({ background })}
+          savedColors={savedColors}
+          onSaveColor={(hex) => setSavedColors((previous) => (previous.includes(hex) ? previous : [...previous, hex]))}
           onAddSticker={handleAddSticker}
           onTextChange={handleTextChange}
           onPickFont={handlePickFont}
@@ -263,8 +268,8 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
           )}
         </div>
 
-        <button type="button" className="edit-page__done" onClick={handleDone}>
-          DONE
+        <button type="button" className="edit-page__done" disabled={!exportReady} onClick={handleDone}>
+          {exportReady ? "DONE" : "Loading photos…"}
         </button>
       </footer>
     </main>

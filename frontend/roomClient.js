@@ -321,7 +321,7 @@ export class RoomClient {
   onMetadata(raw) {
     const state = parsePublicState(raw);
     if (!state) return;
-    this.patch({ state });
+    this.adoptState(state);
     this.checkConsistency();
     this.scheduleGraceExpiry();
   }
@@ -358,6 +358,10 @@ export class RoomClient {
     return this.post("sync");
   }
 
+  capture(body) {
+    return this.post("capture", body);
+  }
+
   async refreshToken() {
     try {
       const res = await fetch("/api/token/refresh", {
@@ -373,12 +377,14 @@ export class RoomClient {
 
   async post(path, body) {
     try {
+      const sentAt = Date.now();
       const res = await fetch(`/api/rooms/${encodeURIComponent(this.session.code)}/${path}`, {
         method: "POST",
         headers: { authorization: `Bearer ${this.session.token}`, "content-type": "application/json" },
         body: JSON.stringify(body ?? {}),
       });
       const data = await res.json().catch(() => null);
+      if (Number.isFinite(data?.serverTime)) this.clockOffset = data.serverTime - (sentAt + Date.now()) / 2;
       this.adoptState(data?.state);
       if (res.ok) return { ok: true };
       if (res.status === 404) this.patch({ ended: true, notice: "This meeting has ended." });

@@ -6,7 +6,8 @@
   "description": "Photobooth-style video room: everyone's camera overlaid into one image, with a host-controlled layer stack.",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "node --test tests/*.test.js"
   },
   "engines": {
     "node": ">=20.9"

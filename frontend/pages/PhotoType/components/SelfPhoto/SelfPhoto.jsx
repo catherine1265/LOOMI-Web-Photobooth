@@ -4,6 +4,9 @@ import "./style/SelfPhoto.css";
 import Navbar from "../../../Navbar/tampilan/Navbar";
 import { photoTypes } from "../FrameType/FrameType";
 import { saveSoloSession } from "../../../../photoStore.js";
+import { getSlotRatio } from "../../../../printSpec.js";
+import { poses } from "./poses.js";
+import PoseIdeas from "./PoseIdeas.jsx";
 
 export function Sparkle({ className = "" }) {
   return (
@@ -57,9 +60,21 @@ export function RetakeIcon() {
 }
 
 export function BlurredPlaceholder({ photo, index }) {
+function BlurredPlaceholder({ photo, index, hint, onHintClick }) {
   return (
     <div className="self-photo__result-image">
-      {photo ? (
+      {!photo && hint ? (
+        <button
+          type="button"
+          className="self-photo__pose-hint"
+          onClick={onHintClick}
+          aria-label={`Pose idea for photo ${index + 1}. Click to change the pose ideas`}
+          title="Click to change the pose ideas"
+        >
+          <img src={hint} alt="" loading="lazy" />
+          <span className="self-photo__pose-tag">Pose</span>
+        </button>
+      ) : photo ? (
         <img
           src={photo}
           alt={`Photo result ${index + 1}`}
@@ -77,11 +92,38 @@ export function BlurredPlaceholder({ photo, index }) {
   );
 }
 
+function drawMirrored(canvas, video, area) {
+  canvas.width = area.width;
+  canvas.height = area.height;
+
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+
+  context.save();
+  context.translate(canvas.width, 0);
+  context.scale(-1, 1);
+  context.drawImage(
+    video,
+    area.x,
+    area.y,
+    area.width,
+    area.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+  context.restore();
+
+  return canvas.toDataURL("image/jpeg", 0.92);
+}
+
 export default function SelfPhoto({ onBack, onDone, frameType }) {
   const frame =
     photoTypes.find((type) => type.id === frameType) ??
     photoTypes.find((type) => type.id === "1x3");
   const slots = frame.slots;
+  const slotRatio = getSlotRatio(frame.id);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -93,6 +135,8 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
   const [photos, setPhotos] = useState([]);
   const [doneMessage, setDoneMessage] = useState("");
   const [retryToken, setRetryToken] = useState(0);
+  const [poseOpen, setPoseOpen] = useState(false);
+  const [selectedPoses, setSelectedPoses] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -184,21 +228,43 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
       return;
     }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const { videoWidth, videoHeight } = video;
+    let cropWidth = videoWidth;
+    let cropHeight = videoWidth / slotRatio;
 
-    const context = canvas.getContext("2d");
+    if (cropHeight > videoHeight) {
+      cropHeight = videoHeight;
+      cropWidth = videoHeight * slotRatio;
+    }
 
-    if (!context) {
+    const crop = {
+      x: (videoWidth - cropWidth) / 2,
+      y: (videoHeight - cropHeight) / 2,
+      width: Math.round(cropWidth),
+      height: Math.round(cropHeight),
+    };
+
+    const original = drawMirrored(canvas, video, {
+      x: 0,
+      y: 0,
+      width: videoWidth,
+      height: videoHeight,
+    });
+    const src = drawMirrored(canvas, video, crop);
+
+    if (!src || !original) {
       setCameraError("Unable to capture the photo.");
       return;
     }
 
-    context.translate(canvas.width, 0);
-    context.scale(-1, 1);
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    addPhoto({ src, original });
+  }
 
-    addPhoto(canvas.toDataURL("image/jpeg", 0.92));
+  function togglePose(source) {
+    setSelectedPoses((previous) => {
+      if (previous.includes(source)) return previous.filter((item) => item !== source);
+      return previous.length < slots ? [...previous, source] : previous;
+    });
   }
 
   function addPhoto(source) {
@@ -226,7 +292,7 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
 
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        addPhoto(reader.result);
+        addPhoto({ src: reader.result, original: reader.result });
       }
     };
 
@@ -280,7 +346,10 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
             <section className="self-photo-camera-card">
               <Sparkle className="self-photo__sparkle--camera" />
 
-              <div className="self-photo-camera-viewport">
+              <div
+                className="self-photo-camera-viewport"
+                style={{ "--slot-ratio": slotRatio }}
+              >
                 <video
                   ref={videoRef}
                   className="self-photo-video"
@@ -311,6 +380,8 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
                 )}
               </div>
 
+              <p className="self-photo-hint">Keep your face in the middle</p>
+
               <button
                 className="self-photo-shutter"
                 type="button"
@@ -329,18 +400,20 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
               <button
                 type="button"
                 className="self-photo-action"
-                onClick={capturePhoto}
-                disabled={cameraStatus !== "ready"}
+                onClick={() => uploadRef.current?.click()}
               >
-                Take a Photo
+                Upload Photo
               </button>
 
               <button
                 type="button"
                 className="self-photo-action"
-                onClick={() => uploadRef.current?.click()}
+                aria-pressed={poseOpen}
+                disabled={poses.length === 0}
+                title={poses.length === 0 ? "No pose ideas yet" : undefined}
+                onClick={() => setPoseOpen((open) => !open)}
               >
-                Upload Photo
+                Pose Ideas
               </button>
 
               <input
@@ -376,12 +449,24 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
                 {Array.from({ length: slots }, (_, index) => (
                   <BlurredPlaceholder
                     key={index}
-                    photo={photos[index]}
+                    photo={photos[index]?.src}
                     index={index}
+                    hint={selectedPoses[index]}
+                    onHintClick={() => setPoseOpen(true)}
                   />
                 ))}
               </div>
             </div>
+
+            {poseOpen && (
+              <PoseIdeas
+                selected={selectedPoses}
+                max={slots}
+                onToggle={togglePose}
+                onClear={() => setSelectedPoses([])}
+                onClose={() => setPoseOpen(false)}
+              />
+            )}
 
             <button
               type="button"

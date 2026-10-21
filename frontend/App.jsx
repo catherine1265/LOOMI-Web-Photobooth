@@ -32,12 +32,24 @@ import {
 } from "./ui.jsx";
 
 import "./index.css";
+import { getPhotoSession } from "./photoStore.js";
+
+function readFrameType() {
+  try { return sessionStorage.getItem("loomi.frameType") || null; } catch { return null; }
+}
 
 function App() {
   const [path, setPath] = useState(window.location.pathname);
   const [search, setSearch] = useState(window.location.search);
   const [afterFrameType, setAfterFrameType] = useState(null);
-  const [frameType, setFrameType] = useState(null);
+  const [frameType, setFrameType] = useState(readFrameType);
+
+  useEffect(() => {
+    try {
+      if (frameType) sessionStorage.setItem("loomi.frameType", frameType);
+      else sessionStorage.removeItem("loomi.frameType");
+    } catch {}
+  }, [frameType]);
 
   useEffect(() => {
     const onPop = () => {
@@ -119,6 +131,7 @@ function App() {
         onDone={() => navigateInternal("/edit")}
       />
     );
+    return <RoomScreen key={code} code={code} frameType={frameType} onEdit={() => navigateInternal("/edit")} />;
   }
 
   if (isLandingPage) {
@@ -171,7 +184,8 @@ function App() {
             setFrameType(id);
           }
 
-          navigateInternal("/self-photo");
+          const photoSession = getPhotoSession();
+          navigateInternal(photoSession?.source === "collab" ? `/room/${photoSession.roomCode}` : "/self-photo");
         }}
         onDone={() => navigateInternal("/result-photo")}
       />
