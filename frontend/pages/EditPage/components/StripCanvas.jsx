@@ -24,8 +24,8 @@ function usePreviewHeight() {
   return height;
 }
 
-function usePhotoCanvases(photos, effectId, rects) {
-  const [canvases, setCanvases] = useState([]);
+function usePhotoCanvases(photos, effectId, rects, source) {
+  const [loaded, setLoaded] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,38 +36,39 @@ function usePhotoCanvases(photos, effectId, rects) {
         const rect = rects[photo.slotIndex];
         if (!rect) return null;
         const image = await loadImage(photo.src);
-        return { rect, canvas: buildPhotoCanvas(image, rect.width, rect.height, filter) };
+        return { rect, canvas: buildPhotoCanvas(image, rect.width, rect.height, filter, source === "collab" ? "contain" : "cover") };
       })
     )
-      .then((result) => !cancelled && setCanvases(result.filter(Boolean)))
+      .then((result) => !cancelled && setLoaded({ photos, effectId, rects, source, canvases: result.filter(Boolean) }))
       .catch(() => {});
 
     return () => {
       cancelled = true;
     };
-  }, [photos, effectId, rects]);
+  }, [photos, effectId, rects, source]);
 
-  return canvases;
+  const current = loaded?.photos === photos && loaded.effectId === effectId && loaded.rects === rects && loaded.source === source;
+  return current ? loaded.canvases : [];
 }
 
 function useBackgroundImage(background) {
-  const [image, setImage] = useState(null);
+  const [loaded, setLoaded] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
     if (!background?.src) {
-      setImage(null);
+      setLoaded(null);
       return;
     }
     loadImage(background.src)
-      .then((loaded) => !cancelled && setImage(loaded))
+      .then((image) => !cancelled && setLoaded({ src: background.src, image }))
       .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [background]);
 
-  return image;
+  return loaded?.src === background?.src ? loaded?.image : null;
 }
 
 export default function StripCanvas({
@@ -78,6 +79,7 @@ export default function StripCanvas({
   onChange,
   stageRef,
   transformerRef,
+  onReady,
 }) {
   const containerRef = useRef(null);
   const nodesRef = useRef(new Map());
@@ -85,8 +87,11 @@ export default function StripCanvas({
 
   const spec = printSpec[session.frameType];
   const rects = useMemo(() => getSlotRects(spec), [spec]);
-  const photoCanvases = usePhotoCanvases(session.photos, edits.effectId, rects);
+  const photoCanvases = usePhotoCanvases(session.photos, edits.effectId, rects, session.source);
   const backgroundImage = useBackgroundImage(edits.background);
+  const ready = photoCanvases.length === session.photos.length && (!edits.background?.src || !!backgroundImage);
+
+  useEffect(() => { onReady(ready); }, [ready, onReady]);
 
   const previewHeight = usePreviewHeight();
   const previewWidth = Math.round((previewHeight * spec.width) / spec.height);

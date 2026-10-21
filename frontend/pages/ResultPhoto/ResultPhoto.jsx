@@ -5,6 +5,7 @@ import "./Style/ResultPhoto.css";
 import {
   clearResultPhoto,
   getResultPhoto,
+  hasResultPersistenceWarning,
 } from "./ResultPhoto.js";
 
 import { clearPhotoSession } from "../../photoStore.js";
@@ -104,6 +105,7 @@ export default function ResultPhoto({ onGetAnother }) {
       <Navbar />
 
       <section className="result-photo">
+        {hasResultPersistenceWarning() && <p role="status">Storage is full. Download your photo before refreshing this page.</p>}
         {photo ? (
           <div className="result-photo__content">
             <div className="result-photo__printer">
