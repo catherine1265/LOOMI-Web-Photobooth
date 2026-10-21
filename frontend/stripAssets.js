@@ -26,6 +26,29 @@ export function readTheme(element) {
   };
 }
 
+export function captureFrom(source, sourceWidth, sourceHeight, ratio) {
+  let cropWidth = sourceWidth;
+  let cropHeight = sourceWidth / ratio;
+
+  if (cropHeight > sourceHeight) {
+    cropHeight = sourceHeight;
+    cropWidth = sourceHeight * ratio;
+  }
+
+  const draw = (x, y, width, height) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(width);
+    canvas.height = Math.round(height);
+    canvas.getContext("2d").drawImage(source, x, y, width, height, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.92);
+  };
+
+  return {
+    src: draw((sourceWidth - cropWidth) / 2, (sourceHeight - cropHeight) / 2, cropWidth, cropHeight),
+    original: draw(0, 0, sourceWidth, sourceHeight),
+  };
+}
+
 export function coverCrop(image, width, height, alignY = 0.5) {
   const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
   const cropWidth = width / scale;

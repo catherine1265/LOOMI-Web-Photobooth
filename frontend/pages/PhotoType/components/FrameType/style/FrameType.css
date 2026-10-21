@@ -331,6 +331,24 @@
   transform: rotate(12deg);
 }
 
+@media (max-height: 760px) {
+  .frame-type__options {
+    zoom: 0.85;
+  }
+}
+
+@media (max-height: 680px) {
+  .frame-type__options {
+    zoom: 0.72;
+  }
+}
+
+@media (max-height: 600px) {
+  .frame-type__options {
+    zoom: 0.6;
+  }
+}
+
 @media (max-width: 900px) {
   .frame-type-page {
     height: auto;

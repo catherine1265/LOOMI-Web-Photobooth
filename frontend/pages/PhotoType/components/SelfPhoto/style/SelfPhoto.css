@@ -6,7 +6,7 @@
   --results-pad-y: clamp(14px, 3vh, 32px);
   --results-avail: calc(
     100dvh - 61px - clamp(24px, 6vh, 64px) - clamp(16px, 3vh, 40px) -
-      2 * var(--results-pad-y) - 40px
+      2 * var(--results-pad-y) - 72px
   );
 
   height: 100vh;
@@ -63,6 +63,8 @@
   flex: 1;
   min-height: 0;
   margin: 0 auto;
+  box-sizing: border-box;
+  padding-right: 180px;
 
   display: grid;
   grid-template-columns: minmax(0, 740px) 280px;
@@ -546,6 +548,7 @@
 
   .self-photo-stage {
     max-width: 100%;
+    padding-right: 120px;
     grid-template-columns: minmax(0, 1fr) 190px;
     column-gap: 100px;
   }
@@ -605,6 +608,7 @@
   .self-photo-stage {
     flex: none;
     max-width: 480px;
+    padding-right: 0;
     grid-template-columns: minmax(0, 1fr);
     row-gap: 35px;
   }

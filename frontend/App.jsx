@@ -111,7 +111,14 @@ function App() {
   ]);
 
   if (code) {
-    return <RoomScreen key={code} code={code} />;
+    return (
+      <RoomScreen
+        key={code}
+        code={code}
+        frameType={frameType}
+        onDone={() => navigateInternal("/edit")}
+      />
+    );
   }
 
   if (isLandingPage) {

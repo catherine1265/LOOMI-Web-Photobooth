@@ -5,7 +5,7 @@ import Navbar from "../../../Navbar/tampilan/Navbar";
 import { photoTypes } from "../FrameType/FrameType";
 import { saveSoloSession } from "../../../../photoStore.js";
 
-function Sparkle({ className = "" }) {
+export function Sparkle({ className = "" }) {
   return (
     <svg
       className={`self-photo__sparkle ${className}`}
@@ -23,7 +23,7 @@ function Sparkle({ className = "" }) {
   );
 }
 
-function CameraIcon() {
+export function CameraIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
@@ -36,7 +36,7 @@ function CameraIcon() {
   );
 }
 
-function RetakeIcon() {
+export function RetakeIcon() {
   return (
     <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
       <path
@@ -56,7 +56,7 @@ function RetakeIcon() {
   );
 }
 
-function BlurredPlaceholder({ photo, index }) {
+export function BlurredPlaceholder({ photo, index }) {
   return (
     <div className="self-photo__result-image">
       {photo ? (
