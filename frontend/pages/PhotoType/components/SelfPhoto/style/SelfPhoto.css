@@ -4,6 +4,7 @@
   --self-cream: #fff5cb;
   --self-blue: #cbdce5;
   --results-pad-y: clamp(14px, 3vh, 32px);
+  --camera-h: max(220px, min(calc(100dvh - 390px), 560px));
   --results-avail: calc(
     100dvh - 61px - clamp(24px, 6vh, 64px) - clamp(16px, 3vh, 40px) -
       2 * var(--results-pad-y) - 40px
@@ -93,6 +94,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 
   border: 1.3px solid var(--self-burgundy);
   border-radius: 29px;
@@ -105,13 +107,23 @@
 .self-photo-camera-viewport {
   position: relative;
 
-  width: 100%;
-  flex: 1;
-  min-height: 0;
+  width: min(100%, calc(var(--camera-h) * var(--slot-ratio)));
+  aspect-ratio: var(--slot-ratio);
+  flex: none;
   overflow: hidden;
 
   border-radius: 12px;
   background: #6d252b;
+}
+
+.self-photo-hint {
+  flex: none;
+  margin: 8px 0 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  text-align: center;
 }
 
 .self-photo-video {
@@ -840,8 +852,7 @@
   }
 
   .self-photo-camera-viewport {
-    flex: none;
-    aspect-ratio: 1.2;
+    width: 100%;
   }
 
   .self-photo-shutter {

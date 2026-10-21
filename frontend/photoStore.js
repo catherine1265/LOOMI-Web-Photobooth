@@ -77,10 +77,14 @@ function toJpeg(src) {
 
 export async function saveSoloSession(frameType, sources) {
   const photos = await Promise.all(
-    sources.map(async (source, slotIndex) => ({
-      slotIndex,
-      src: await toJpeg(source),
-    }))
+    sources.map(async (source, slotIndex) => {
+      const item = typeof source === "string" ? { src: source } : source;
+      return {
+        slotIndex,
+        src: await toJpeg(item.src),
+        ...(item.original ? { original: await toJpeg(item.original) } : {}),
+      };
+    })
   );
 
   setPhotoSession({ source: "solo", frameType, photos });
