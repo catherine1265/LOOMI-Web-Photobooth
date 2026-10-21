@@ -30,6 +30,11 @@ export const printSpec = {
   "2x2": build(GRID, 2, 2, 8, { left: 16, right: 16, top: 16, bottom: 16 }),
 };
 
+export function getSlotRatio(frameId) {
+  const [slot] = getSlotRects(printSpec[frameId]);
+  return slot.width / slot.height;
+}
+
 export function getSlotRects(spec) {
   const { width, height, columns, rows, gap, pad } = spec;
   const slotWidth = (width - pad.left - pad.right - gap * (columns - 1)) / columns;

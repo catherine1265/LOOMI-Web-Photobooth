@@ -4,6 +4,7 @@ import "./style/SelfPhoto.css";
 import Navbar from "../../../Navbar/tampilan/Navbar";
 import { photoTypes } from "../FrameType/FrameType";
 import { saveSoloSession } from "../../../../photoStore.js";
+import { getSlotRatio } from "../../../../printSpec.js";
 
 function Sparkle({ className = "" }) {
   return (
@@ -77,11 +78,38 @@ function BlurredPlaceholder({ photo, index }) {
   );
 }
 
+function drawMirrored(canvas, video, area) {
+  canvas.width = area.width;
+  canvas.height = area.height;
+
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+
+  context.save();
+  context.translate(canvas.width, 0);
+  context.scale(-1, 1);
+  context.drawImage(
+    video,
+    area.x,
+    area.y,
+    area.width,
+    area.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+  context.restore();
+
+  return canvas.toDataURL("image/jpeg", 0.92);
+}
+
 export default function SelfPhoto({ onBack, onDone, frameType }) {
   const frame =
     photoTypes.find((type) => type.id === frameType) ??
     photoTypes.find((type) => type.id === "1x3");
   const slots = frame.slots;
+  const slotRatio = getSlotRatio(frame.id);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -184,21 +212,36 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
       return;
     }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const { videoWidth, videoHeight } = video;
+    let cropWidth = videoWidth;
+    let cropHeight = videoWidth / slotRatio;
 
-    const context = canvas.getContext("2d");
+    if (cropHeight > videoHeight) {
+      cropHeight = videoHeight;
+      cropWidth = videoHeight * slotRatio;
+    }
 
-    if (!context) {
+    const crop = {
+      x: (videoWidth - cropWidth) / 2,
+      y: (videoHeight - cropHeight) / 2,
+      width: Math.round(cropWidth),
+      height: Math.round(cropHeight),
+    };
+
+    const original = drawMirrored(canvas, video, {
+      x: 0,
+      y: 0,
+      width: videoWidth,
+      height: videoHeight,
+    });
+    const src = drawMirrored(canvas, video, crop);
+
+    if (!src || !original) {
       setCameraError("Unable to capture the photo.");
       return;
     }
 
-    context.translate(canvas.width, 0);
-    context.scale(-1, 1);
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    addPhoto(canvas.toDataURL("image/jpeg", 0.92));
+    addPhoto({ src, original });
   }
 
   function addPhoto(source) {
@@ -226,7 +269,7 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
 
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        addPhoto(reader.result);
+        addPhoto({ src: reader.result, original: reader.result });
       }
     };
 
@@ -280,7 +323,10 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
             <section className="self-photo-camera-card">
               <Sparkle className="self-photo__sparkle--camera" />
 
-              <div className="self-photo-camera-viewport">
+              <div
+                className="self-photo-camera-viewport"
+                style={{ "--slot-ratio": slotRatio }}
+              >
                 <video
                   ref={videoRef}
                   className="self-photo-video"
@@ -310,6 +356,8 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
                   </div>
                 )}
               </div>
+
+              <p className="self-photo-hint">Keep your face in the middle</p>
 
               <button
                 className="self-photo-shutter"
@@ -376,7 +424,7 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
                 {Array.from({ length: slots }, (_, index) => (
                   <BlurredPlaceholder
                     key={index}
-                    photo={photos[index]}
+                    photo={photos[index]?.src}
                     index={index}
                   />
                 ))}
