@@ -47,7 +47,7 @@ export function coverCrop(image, width, height, alignY = 0.5) {
   };
 }
 
-export function buildPhotoCanvas(image, width, height, filter) {
+export function buildPhotoCanvas(image, width, height, filter, fit = "cover") {
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(width);
   canvas.height = Math.round(height);
@@ -63,6 +63,14 @@ export function buildPhotoCanvas(image, width, height, filter) {
 
   context.save();
   context.filter = filter;
+  if (fit === "contain") {
+    const ratio = Math.min(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+    const drawnWidth = image.naturalWidth * ratio;
+    const drawnHeight = image.naturalHeight * ratio;
+    context.drawImage(image, (canvas.width - drawnWidth) / 2, (canvas.height - drawnHeight) / 2, drawnWidth, drawnHeight);
+    context.restore();
+    return canvas;
+  }
   context.drawImage(
     image,
     crop.x,

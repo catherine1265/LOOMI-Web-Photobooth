@@ -34,6 +34,7 @@ node_modules/
 dist/
 build/
 coverage/
+tmp/capture-tests/
 
 
 # 5. LOCAL CONFIGURATION
