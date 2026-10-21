@@ -60,13 +60,20 @@ try {
     function Harness() {
       const snap = useSyncExternalStore(client.subscribe, client.getSnapshot);
       const canvasRef = useRef(null);
+      const captureFrameRef = useRef(null);
       useEffect(() => {
         const ctx = canvasRef.current.getContext("2d");
         ctx.fillStyle = "#ff0000"; ctx.fillRect(0, 0, 1280, 720);
         ctx.fillStyle = "#00ff00"; ctx.fillRect(0, 0, 180, 720);
         ctx.fillStyle = "#0000ff"; ctx.fillRect(1100, 0, 180, 720);
+        // No animation loop: a capture must request a fresh render itself.
+        captureFrameRef.current = () => {
+          window.captureRenders = (window.captureRenders || 0) + 1;
+          ctx.fillStyle = "#ffff00"; ctx.fillRect(600, 300, 80, 80);
+        };
+        return () => { captureFrameRef.current = null; };
       }, []);
-      return React.createElement(CaptureBooth, { client, snap, canvasRef, initialFrameType: "1x2", onEdit: () => { window.didEdit = true; } },
+      return React.createElement(CaptureBooth, { client, snap, canvasRef, captureFrameRef, initialFrameType: "1x2", onEdit: () => { window.didEdit = true; } },
         React.createElement("canvas", { ref: canvasRef, width: 1280, height: 720, style: { width: "100%" } }));
     }
     window.mockClient = client;
@@ -78,7 +85,20 @@ try {
   await page.waitForTimeout(3300);
   assert.equal(await page.locator(".capture-booth__slot img").count(), 0, "cancel must not save a photo");
   await page.getByRole("button", { name: "Take photos", exact: true }).click();
+  // Chrome/Edge can mark the host document hidden when the guest window is foregrounded.
+  await page.evaluate(() => Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "hidden" }));
   await page.waitForFunction(() => document.querySelectorAll(".capture-booth__slot img").length === 2, null, { timeout: 12000 });
+  assert.equal(await page.getByRole("alert").count(), 0, "switching away from the host must not cancel capture");
+  assert.equal(await page.evaluate(() => window.captureRenders), 2, "each shot explicitly refreshes the canvas");
+  const center = await page.evaluate(async () => {
+    const photo = JSON.parse(sessionStorage.getItem("loomi.photoSession")).photos[0];
+    const image = new Image(); image.src = photo.src; await image.decode();
+    const canvas = document.createElement("canvas"); canvas.width = 1280; canvas.height = 720;
+    const ctx = canvas.getContext("2d"); ctx.drawImage(image, 0, 0);
+    return [...ctx.getImageData(640, 340, 1, 1).data];
+  });
+  assert.ok(center[0] > 240 && center[1] > 240 && center[2] < 20, "snapshot must include freshly drawn pixels");
+  await page.evaluate(() => { delete document.visibilityState; });
   assert.equal(await page.getByRole("button", { name: "Continue to edit" }).isEnabled(), true);
   await page.getByRole("button", { name: "Retake photo 1" }).click();
   await page.waitForFunction(() => window.mockClient.snapshot.state.capture.status === "done");
@@ -132,7 +152,7 @@ try {
   await page.getByRole("button", { name: "Download photo", exact: true }).click();
   assert.equal((await finalDownloadEvent).suggestedFilename(), "loomi-photo.png");
   assert.deepEqual(pageErrors, []);
-  console.log("PASS: cancellation, automatic multi-shot, retake, PNG download, guest countdown, disconnect cancellation, mobile layout, real editor/result, and refresh persistence.");
+  console.log("PASS: background-host capture, fresh canvas snapshots, cancellation, automatic multi-shot, retake, PNG download, guest countdown, disconnect cancellation, mobile layout, real editor/result, and refresh persistence.");
 } finally {
   await browser?.close();
   await server.close();

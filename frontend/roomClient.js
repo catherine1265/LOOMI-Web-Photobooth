@@ -4,6 +4,7 @@
 import { ConnectionState, Room, RoomEvent, Track } from "livekit-client";
 import { IDENTITY_PREFIX, RECONNECT_GRACE_MS } from "../lib/config.js";
 import { parsePublicState } from "../lib/roomState.js";
+import { estimateServerClock } from "../lib/clock.js";
 
 // ---- API calls ----------------------------------------------------------------------
 
@@ -384,7 +385,8 @@ export class RoomClient {
         body: JSON.stringify(body ?? {}),
       });
       const data = await res.json().catch(() => null);
-      if (Number.isFinite(data?.serverTime)) this.clockOffset = data.serverTime - (sentAt + Date.now()) / 2;
+      const offset = estimateServerClock(sentAt, Date.now(), data?.serverReceivedAt, data?.serverTime);
+      if (offset !== null) this.clockOffset = offset;
       this.adoptState(data?.state);
       if (res.ok) return { ok: true };
       if (res.status === 404) this.patch({ ended: true, notice: "This meeting has ended." });

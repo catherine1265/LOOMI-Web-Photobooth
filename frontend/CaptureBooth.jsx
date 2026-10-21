@@ -10,7 +10,7 @@ function readDraft(code) {
   return draft?.source === "collab" && draft.roomCode === code && Object.hasOwn(CAPTURE_LAYOUTS, draft.frameType) ? draft : null;
 }
 
-export default function CaptureBooth({ client, snap, initialFrameType, canvasRef, onEdit, children }) {
+export default function CaptureBooth({ client, snap, initialFrameType, canvasRef, captureFrameRef, onEdit, children }) {
   const [draft] = useState(() => readDraft(client.session.code));
   const [frameType, setFrameType] = useState(draft?.frameType || (Object.hasOwn(CAPTURE_LAYOUTS, initialFrameType) ? initialFrameType : "1x3"));
   const [photos, setPhotos] = useState(draft?.photos || []);
@@ -44,18 +44,21 @@ export default function CaptureBooth({ client, snap, initialFrameType, canvasRef
     setStorageWarning(saved ? "" : "Storage is full. Keep this tab open and download your photos before refreshing.");
   }
 
-  function cameraReady() {
+  function sessionReady() {
     const snapshot = client.getSnapshot();
-    const video = client.getVideoElement(client.session.identity);
-    return snapshot.connection === "connected" && snapshot.cameraOn && video?.readyState >= 2 &&
-      snapshot.state?.hostIdentity === client.session.identity && document.visibilityState === "visible";
+    return snapshot.connection === "connected" && snapshot.cameraOn &&
+      snapshot.state?.hostIdentity === client.session.identity;
+  }
+
+  function cameraReady() {
+    return sessionReady() && client.getVideoElement(client.session.identity)?.readyState >= 2;
   }
 
   async function start(slotIndex) {
     if (pending.current) return;
     if (!cameraReady()) {
       sequence.current = [];
-      setError("Keep this tab visible and wait for your camera and connection to be ready.");
+      setError("Wait for your camera and connection to be ready before taking photos.");
       return;
     }
     pending.current = true;
@@ -88,18 +91,29 @@ export default function CaptureBooth({ client, snap, initialFrameType, canvasRef
     if (pending.current || handled.current.has(current.id) || cancelled.current.has(current.id)) return;
     handled.current.add(current.id);
     const attempt = generation.current;
-    if (!cameraReady() || Date.now() + (client.clockOffset || 0) - current.captureAt > CAPTURE_LATE_MS || !canvasRef.current) {
+    const lateBy = Date.now() + (client.clockOffset || 0) - current.captureAt;
+    if (!cameraReady() || lateBy > CAPTURE_LATE_MS || !canvasRef.current) {
       sequence.current = [];
-      setError("Capture was interrupted. Check your camera and retake this photo.");
+      setError(!sessionReady() ? "The host camera or connection changed. Reconnect and retake this photo."
+        : !canvasRef.current ? "The photo preview is not ready yet. Wait for it to appear, then retry."
+          : !cameraReady() ? "The host camera has no readable video frame. Turn the camera off and on, then retry."
+            : "The browser missed the countdown deadline. Return to the host window and retake this photo.");
       await cancel();
       return;
     }
     pending.current = true;
     setBusy(true);
     try {
+      // A hidden browser can pause requestAnimationFrame. Render explicitly so
+      // switching between the host and guest windows cannot save an old preview.
+      captureFrameRef?.current?.();
       // The countdown is a DOM overlay, so it is never included in this snapshot.
       const src = canvasRef.current.toDataURL("image/jpeg", 0.92);
-      const result = await client.capture({ action: "complete", captureId: current.id });
+      const capturedAt = Date.now() + (client.clockOffset || 0);
+      if (capturedAt - current.captureAt > CAPTURE_LATE_MS) {
+        throw new Error("Rendering the combined photo took too long. Return to the host window and retake this photo.");
+      }
+      const result = await client.capture({ action: "complete", captureId: current.id, capturedAt });
       if (!mounted.current || generation.current !== attempt) return;
       if (!result.ok || client.getSnapshot().state?.capture?.id !== current.id || client.getSnapshot().state?.capture?.status !== "done") {
         throw new Error(result.message || "Capture was cancelled. Please retake the photo.");
@@ -130,10 +144,13 @@ export default function CaptureBooth({ client, snap, initialFrameType, canvasRef
       if (current?.status !== "countdown") return;
       setClock(Date.now());
       if (current.owner !== client.session.identity || cancelled.current.has(current.id)) return;
-      if (!cameraReady()) {
+      if (!sessionReady()) {
         if (!handled.current.has(current.id)) {
           handled.current.add(current.id);
-          setError("Capture cancelled because your camera, connection, or active tab changed.");
+          const snapshot = client.getSnapshot();
+          setError(snapshot.connection !== "connected" ? "Capture cancelled because the host lost the meeting connection. Reconnect and retake the photo."
+            : !snapshot.cameraOn ? "Capture cancelled because the host camera was turned off. Turn it on and retake the photo."
+              : "Capture cancelled because the host changed. The new host can start another capture.");
           void actions.current.cancel();
         }
       } else if (Date.now() + (client.clockOffset || 0) >= current.captureAt) {

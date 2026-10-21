@@ -51,6 +51,7 @@ const CONNECTION_STATUS = {
 
 function RoomView({ client, frameType, onEdit }) {
   const canvasRef = useRef(null);
+  const captureFrameRef = useRef(null);
   const snap = useSyncExternalStore(client.subscribe, client.getSnapshot);
   const [toast, setToast] = useState(null);
   const [leaving, setLeaving] = useState(false);
@@ -126,8 +127,8 @@ function RoomView({ client, frameType, onEdit }) {
 
       <main className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <section aria-label="Preview" className="flex flex-col gap-2">
-          <CaptureBooth client={client} snap={snap} initialFrameType={frameType} canvasRef={canvasRef} onEdit={onEdit}>
-            <PreviewCanvas client={client} stack={stack} canvasRef={canvasRef} />
+          <CaptureBooth client={client} snap={snap} initialFrameType={frameType} canvasRef={canvasRef} captureFrameRef={captureFrameRef} onEdit={onEdit}>
+            <PreviewCanvas client={client} stack={stack} canvasRef={canvasRef} captureFrameRef={captureFrameRef} />
           </CaptureBooth>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Preview of the combined image: the bottom layer fills the background, the other layers are drawn on top in stack
@@ -169,7 +170,7 @@ function RoomView({ client, frameType, onEdit }) {
 
 const FRAME_INTERVAL_MS = 1000 / 30;
 
-function PreviewCanvas({ client, stack, canvasRef }) {
+function PreviewCanvas({ client, stack, canvasRef, captureFrameRef }) {
   const stackRef = useRef(stack);
 
   useEffect(() => {
@@ -181,23 +182,29 @@ function PreviewCanvas({ client, stack, canvasRef }) {
     const compositor = createCompositor();
     let raf = 0;
     let last = 0;
-    const loop = (t) => {
-      raf = requestAnimationFrame(loop);
-      if (t - last < FRAME_INTERVAL_MS) return;
-      last = t;
-      const layers = stackRef.current.map((e) => ({
+    const renderFrame = () => {
+      const currentStack = client.getSnapshot().state?.stack ?? stackRef.current;
+      const layers = currentStack.map((e) => ({
         identity: e.identity,
         name: e.name,
         video: e.absentSince === undefined ? client.getVideoElement(e.identity) : null,
       }));
       compositor.render(layers, canvas);
     };
+    captureFrameRef.current = renderFrame;
+    const loop = (t) => {
+      raf = requestAnimationFrame(loop);
+      if (t - last < FRAME_INTERVAL_MS) return;
+      last = t;
+      renderFrame();
+    };
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
+      captureFrameRef.current = null;
       compositor.dispose();
     };
-  }, [client]);
+  }, [client, canvasRef, captureFrameRef]);
 
   const description =
     stack.length === 0

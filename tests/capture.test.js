@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CAPTURE_LAYOUTS, requestCapture, parseCapture } from "../lib/capture.js";
+import { CAPTURE_LAYOUTS, CAPTURE_ACK_MS, requestCapture, parseCapture } from "../lib/capture.js";
 import { newRoomMetadata, parsePublicState, parseRoomMetadata, requestHostTransfer, requestLeave, syncPresence } from "../lib/roomState.js";
 
 const now = 10_000;
@@ -39,18 +39,27 @@ test("countdown has a server timestamp and survives metadata serialization", () 
 test("duplicate starts conflict; expired attempts can be replaced", () => {
   const meta = start().meta;
   assert.equal(start(meta).error.code, "capture_busy");
-  assert.equal(requestCapture(meta, "host", { action: "start", frameType: "1x1", slotIndex: 0 }, now + 5000, "shot-2").ok, true);
+  assert.equal(requestCapture(meta, "host", { action: "start", frameType: "1x1", slotIndex: 0 }, now + 5000, "shot-2").ok, false);
+  assert.equal(requestCapture(meta, "host", { action: "start", frameType: "1x1", slotIndex: 0 }, now + 3000 + CAPTURE_ACK_MS + 1, "shot-2").ok, true);
 });
 
 test("completion rejects early, stale, and late commands", () => {
   const meta = start().meta;
-  const body = { action: "complete", captureId: "shot-1" };
+  const body = { action: "complete", captureId: "shot-1", capturedAt: now + 3100 };
   assert.equal(requestCapture(meta, "host", body, now + 2000).error.code, "capture_expired");
-  assert.equal(requestCapture(meta, "host", body, now + 5000).error.code, "capture_expired");
+  assert.equal(requestCapture(meta, "host", body, now + 3000 + CAPTURE_ACK_MS + 1).error.code, "capture_expired");
   assert.equal(requestCapture(meta, "host", { ...body, captureId: "old" }, now + 3100).error.code, "capture_changed");
   const done = requestCapture(meta, "host", body, now + 3100).meta;
   assert.equal(done.capture.status, "done");
   assert.equal(requestCapture(done, "host", body, now + 3200).changed, false);
+});
+
+test("an on-time photo can be acknowledged after a slow metadata request", () => {
+  const meta = start().meta;
+  const body = { action: "complete", captureId: "shot-1", capturedAt: now + 3100 };
+  assert.equal(requestCapture(meta, "host", body, now + 15000).meta.capture.status, "done");
+  assert.equal(requestCapture(meta, "host", { ...body, capturedAt: now + 5000 }, now + 15000).error.code, "capture_expired");
+  assert.equal(requestCapture(meta, "host", { ...body, capturedAt: undefined }, now + 15000).error.code, "capture_expired");
 });
 
 test("cancellation prevents a delayed completion from resurrecting a shot", () => {
