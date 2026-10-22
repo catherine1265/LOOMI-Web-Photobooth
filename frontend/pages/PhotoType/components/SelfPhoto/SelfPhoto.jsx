@@ -5,6 +5,9 @@ import Navbar from "../../../Navbar/tampilan/Navbar";
 import { photoTypes } from "../FrameType/FrameType";
 import { saveSoloSession } from "../../../../photoStore.js";
 import { getSlotRatio } from "../../../../printSpec.js";
+import { COUNTDOWN_MS } from "../../../../../lib/capture.js";
+
+const SMILE_MS = 900;
 import { poses } from "./poses.js";
 import PoseIdeas from "./PoseIdeas.jsx";
 
@@ -135,6 +138,10 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
   const [doneMessage, setDoneMessage] = useState("");
   const [retryToken, setRetryToken] = useState(0);
   const [poseOpen, setPoseOpen] = useState(false);
+  const [captureAt, setCaptureAt] = useState(null);
+  const [clock, setClock] = useState(Date.now());
+  const [flash, setFlash] = useState(false);
+  const captureRef = useRef(null);
   const [selectedPoses, setSelectedPoses] = useState([]);
 
   useEffect(() => {
@@ -210,6 +217,49 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
       }
     };
   }, [retryToken]);
+
+  captureRef.current = capturePhoto;
+
+  useEffect(() => {
+    if (captureAt === null) return;
+
+    const timer = setInterval(() => {
+      const now = Date.now();
+      setClock(now);
+
+      if (now >= captureAt) {
+        clearInterval(timer);
+        setCaptureAt(null);
+        captureRef.current();
+        setFlash(true);
+      }
+    }, 50);
+
+    return () => clearInterval(timer);
+  }, [captureAt]);
+
+  useEffect(() => {
+    if (!flash) return;
+    const timer = setTimeout(() => setFlash(false), 180);
+    return () => clearTimeout(timer);
+  }, [flash]);
+
+  function startCountdown() {
+    if (captureAt !== null) return;
+
+    if (photos.length >= slots) {
+      setDoneMessage("The frame is full. Use retake to replace the last photo.");
+      return;
+    }
+
+    setDoneMessage("");
+    setClock(Date.now());
+    setCaptureAt(Date.now() + COUNTDOWN_MS + SMILE_MS);
+  }
+
+  function cancelCountdown() {
+    setCaptureAt(null);
+  }
 
   function capturePhoto() {
     const video = videoRef.current;
@@ -377,6 +427,22 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
                     </button>
                   </div>
                 )}
+
+                {captureAt !== null && (
+                  <div className="self-photo-countdown" role="status" aria-live="polite">
+                    <span>Photo {photos.length + 1} of {slots}</span>
+                    <strong>{captureAt - clock > SMILE_MS ? Math.ceil((captureAt - clock - SMILE_MS) / 1000) : "Smile!"}</strong>
+                    <button
+                      className="self-photo-small-button"
+                      type="button"
+                      onClick={cancelCountdown}
+                    >
+                      CANCEL
+                    </button>
+                  </div>
+                )}
+
+                {flash && <div className="self-photo-flash" aria-hidden="true" />}
               </div>
 
               <p className="self-photo-hint">Keep your face in the middle</p>
@@ -384,10 +450,10 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
               <button
                 className="self-photo-shutter"
                 type="button"
-                onClick={capturePhoto}
+                onClick={captureAt !== null ? cancelCountdown : startCountdown}
                 disabled={cameraStatus !== "ready"}
-                aria-label="Take a photo"
-                title="Take a photo"
+                aria-label={captureAt !== null ? "Cancel the countdown" : "Take a photo"}
+                title={captureAt !== null ? "Cancel the countdown" : "Take a photo"}
               >
                 <CameraIcon />
               </button>
@@ -399,6 +465,7 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
               <button
                 type="button"
                 className="self-photo-action"
+                disabled={captureAt !== null}
                 onClick={() => uploadRef.current?.click()}
               >
                 Upload Photo
