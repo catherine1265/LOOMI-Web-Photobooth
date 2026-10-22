@@ -189,31 +189,51 @@ function PreviewCanvas({ client, stack, canvasRef }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+
+    if (!canvas) return undefined;
+
     const compositor = createCompositor();
+
     let raf = 0;
     let last = 0;
+
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
+
       if (t - last < FRAME_INTERVAL_MS) return;
+
       last = t;
+
       const layers = stackRef.current.map((e) => ({
         identity: e.identity,
         name: e.name,
-        video: e.absentSince === undefined ? client.getVideoElement(e.identity) : null,
+        video:
+          e.absentSince === undefined
+            ? client.getVideoElement(e.identity)
+            : null,
       }));
-      compositor.render(layers, canvas);
+
+      compositor.render(
+        layers,
+        canvas,
+        client.session.identity
+      );
     };
+
     raf = requestAnimationFrame(loop);
+
     return () => {
       cancelAnimationFrame(raf);
       compositor.dispose();
     };
-  }, [client]);
+  }, [client, canvasRef]);
 
   const description =
     stack.length === 0
       ? "Combined preview, waiting for participants."
-      : `Combined preview. Background: ${stack[stack.length - 1].name}. Top layer: ${stack[0].name}.`;
+      : `Combined preview. Background: ${
+          stack[stack.length - 1].name
+        }. Top layer: ${stack[0].name}.`;
 
   return (
     <canvas
@@ -226,7 +246,6 @@ function PreviewCanvas({ client, stack, canvasRef }) {
     />
   );
 }
-
 // ---- Layer panel (host drags to reorder; everyone else sees it read-only) ----------------
 
 function describePosition(index, count) {
