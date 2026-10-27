@@ -5,7 +5,6 @@ import { ConnectionState, Room, RoomEvent, Track } from "livekit-client";
 import { IDENTITY_PREFIX, RECONNECT_GRACE_MS } from "../lib/config.js";
 import { parsePublicState } from "../lib/roomState.js";
 
-// ---- API calls ----------------------------------------------------------------------
 
 async function postJson(url, body) {
   let res;

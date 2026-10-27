@@ -265,7 +265,6 @@ export default function CaptureBooth({ client, snap, initialFrameType, canvasRef
                 </button>
                 {counting && <button type="button" className="room-pill" onClick={() => void cancel()} disabled={busy}>Cancel countdown</button>}
                 {photos.length > 0 && <button type="button" className="room-pill" disabled={locked} onClick={() => persist([])}>Start over</button>}
-                <button type="button" className="room-pill" disabled title="Upload is not available in the room yet">Upload</button>
               </>
             )}
             <button
