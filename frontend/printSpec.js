@@ -1,12 +1,19 @@
+import { WATERMARK_MIN_BOTTOM_HEIGHT_RATIO, getWatermarkBottomNeed } from "./config/watermark.js";
+
 const STRIP = { width: 591, card: { width: 103, height: 270 } };
 const GRID = { width: 1181, card: { width: 192, height: 270 } };
 const POLAROID = { width: 1039, card: { width: 138, height: 190 } };
 
 function build(base, columns, rows, cardGap, cardPad) {
   const k = base.width / base.card.width;
+  const height = Math.round(base.card.height * k);
+  const watermarkBottom = Math.ceil(
+    Math.max(height * WATERMARK_MIN_BOTTOM_HEIGHT_RATIO, getWatermarkBottomNeed(base.width))
+  );
+
   return {
     width: base.width,
-    height: Math.round(base.card.height * k),
+    height,
     columns,
     rows,
     gap: Math.round(cardGap * k),
@@ -14,7 +21,7 @@ function build(base, columns, rows, cardGap, cardPad) {
       left: Math.round(cardPad.left * k),
       right: Math.round(cardPad.right * k),
       top: Math.round(cardPad.top * k),
-      bottom: Math.round(cardPad.bottom * k),
+      bottom: Math.max(Math.round(cardPad.bottom * k), watermarkBottom),
     },
   };
 }

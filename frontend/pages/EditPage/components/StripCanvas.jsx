@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Image as KonvaImage, Layer, Rect, Stage, Transformer } from "react-konva";
+import { Image as KonvaImage, Layer, Rect, Stage, Text as KonvaText, Transformer } from "react-konva";
+import {
+  WATERMARK_FONT_FAMILY,
+  WATERMARK_FONT_STYLE,
+  WATERMARK_OPACITY,
+  WATERMARK_OUTLINE_COLOR,
+  WATERMARK_OUTLINE_EM,
+  getWatermarkLayout,
+} from "../../../config/watermark.js";
 import { effects } from "../../../config/effects.js";
 import { getSlotRects, printSpec } from "../../../printSpec.js";
 import { buildPhotoCanvas, coverCrop, loadImage, readTheme, toRgba } from "../../../stripAssets.js";
@@ -71,6 +79,25 @@ function useBackgroundImage(background) {
   return loaded?.src === background?.src ? loaded?.image : null;
 }
 
+function useWatermarkFont(lines) {
+  const [ready, setReady] = useState(false);
+  const fonts = lines.map(
+    (line) => `${WATERMARK_FONT_STYLE} ${Math.round(line.fontSize)}px ${WATERMARK_FONT_FAMILY}`
+  );
+  const key = fonts.join("|") + lines.map((line) => line.text).join("|");
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(lines.map((line, index) => document.fonts.load(fonts[index], line.text).catch(() => [])))
+      .then(() => !cancelled && setReady(true));
+    return () => {
+      cancelled = true;
+    };
+  }, [key]);
+
+  return ready;
+}
+
 export default function StripCanvas({
   session,
   edits,
@@ -89,7 +116,12 @@ export default function StripCanvas({
   const rects = useMemo(() => getSlotRects(spec), [spec]);
   const photoCanvases = usePhotoCanvases(session.photos, edits.effectId, rects, session.source);
   const backgroundImage = useBackgroundImage(edits.background);
-  const ready = photoCanvases.length === session.photos.length && (!edits.background?.src || !!backgroundImage);
+  const watermark = useMemo(() => getWatermarkLayout(spec), [spec]);
+  const watermarkFontReady = useWatermarkFont(watermark);
+  const ready =
+    photoCanvases.length === session.photos.length &&
+    (!edits.background?.src || !!backgroundImage) &&
+    watermarkFontReady;
 
   useEffect(() => { onReady(ready); }, [ready, onReady]);
 
@@ -192,6 +224,28 @@ export default function StripCanvas({
                 height={rect.height}
               />
             ))}
+            {watermarkFontReady &&
+              watermark.map((line) => (
+                <KonvaText
+                  key={line.text}
+                  text={line.text}
+                  x={line.x}
+                  y={line.y}
+                  width={line.width}
+                  align="center"
+                  fontFamily={WATERMARK_FONT_FAMILY}
+                  fontStyle={WATERMARK_FONT_STYLE}
+                  fontSize={line.fontSize}
+                  letterSpacing={line.letterSpacing}
+                  fill={theme.ink}
+                  stroke={WATERMARK_OUTLINE_COLOR}
+                  strokeWidth={line.fontSize * WATERMARK_OUTLINE_EM}
+                  fillAfterStrokeEnabled
+                  lineJoin="round"
+                  opacity={WATERMARK_OPACITY}
+                  listening={false}
+                />
+              ))}
           </Layer>
 
           <Layer>
