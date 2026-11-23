@@ -8,7 +8,8 @@ import {
   hasResultPersistenceWarning,
 } from "./ResultPhoto.js";
 
-import { clearPhotoSession } from "../../photoStore.js";
+import { clearPhotoSession, getPhotoSession } from "../../photoStore.js";
+import { buildPrintSheet, isStripFrame } from "../../printExport.js";
 
 function DownloadIcon() {
   return (
@@ -20,6 +21,15 @@ function DownloadIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function SheetIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="4" y="3" width="16" height="18" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M12 3v18" stroke="currentColor" strokeWidth="1.7" strokeDasharray="2 2" />
     </svg>
   );
 }
@@ -58,6 +68,25 @@ export default function ResultPhoto({ onGetAnother }) {
     document.body.appendChild(link);
     link.click();
     link.remove();
+  }
+
+  async function handleDownloadSheet() {
+    if (!photo) return;
+
+    try {
+      const url = URL.createObjectURL(await buildPrintSheet(photo));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "loomi-print-sheet.png";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage("");
+    } catch (error) {
+      setMessage(error.message || "Print sheet gagal dibuat.");
+    }
   }
 
   async function handleShare() {
@@ -137,6 +166,18 @@ export default function ResultPhoto({ onGetAnother }) {
               >
                 <DownloadIcon />
               </button>
+
+              {isStripFrame(getPhotoSession()?.frameType) && (
+                <button
+                  type="button"
+                  className="result-photo__action"
+                  onClick={handleDownloadSheet}
+                  aria-label="Download print sheet"
+                  title="Download print sheet (4R, 2 strips)"
+                >
+                  <SheetIcon />
+                </button>
+              )}
 
               <button
                 type="button"
