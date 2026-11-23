@@ -14,7 +14,7 @@ import {
 import StripCanvas from "./components/StripCanvas.jsx";
 import EditorPanel from "./components/EditorPanel.jsx";
 import UnlockPopup from "./components/UnlockPopup.jsx";
-import { isWatermarkUnlocked, rememberWatermarkUnlocked } from "../../config/unlock.js";
+import { isWatermarkUnlocked, rememberWatermarkUnlocked, resetWatermarkUnlocked } from "../../config/unlock.js";
 import { setResultPhoto } from "../ResultPhoto/ResultPhoto.js";
 
 const INITIAL_EDITS = { effectId: "original", background: null, stickers: [], texts: [], showWatermark: true };
@@ -176,6 +176,8 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
       removeItem(selected.id);
       return;
     }
+
+    resetWatermarkUnlocked();
 
     const frameType = session.frameType;
     if (session.source !== "collab") clearPhotoSession();

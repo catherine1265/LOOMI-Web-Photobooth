@@ -46,3 +46,11 @@ export function rememberWatermarkUnlocked() {
     // sessionStorage unavailable; unlock only lasts until the page reloads.
   }
 }
+
+export function resetWatermarkUnlocked() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // sessionStorage unavailable; nothing to reset.
+  }
+}

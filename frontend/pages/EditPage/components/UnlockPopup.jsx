@@ -166,6 +166,9 @@ export default function UnlockPopup({ onUnlock, onSkip }) {
         </p>
 
         <div className="edit-unlock__actions">
+          <button type="button" className="edit-unlock__button" disabled={success} onClick={onSkip}>
+            NO CODE
+          </button>
           <button
             type="button"
             className="edit-unlock__button edit-unlock__button--primary"
@@ -173,9 +176,6 @@ export default function UnlockPopup({ onUnlock, onSkip }) {
             onClick={() => void submit()}
           >
             ENTER CODE
-          </button>
-          <button type="button" className="edit-unlock__button" disabled={success} onClick={onSkip}>
-            NO CODE
           </button>
         </div>
       </div>
