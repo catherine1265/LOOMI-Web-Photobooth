@@ -433,7 +433,7 @@
 }
 
 .self-photo-frame--2x2 {
-  --frame-ratio: calc(192 / 270);
+  --frame-ratio: calc(200 / 300);
 }
 
 .self-photo-frame .self-photo__result-image {

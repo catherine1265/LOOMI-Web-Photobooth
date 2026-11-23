@@ -1,7 +1,7 @@
 import { WATERMARK_MIN_BOTTOM_HEIGHT_RATIO, getWatermarkBottomNeed } from "./config/watermark.js";
 
 const STRIP = { width: 591, card: { width: 103, height: 270 } };
-const GRID = { width: 1181, card: { width: 192, height: 270 } };
+const GRID = { width: 1200, card: { width: 200, height: 300 } };
 const POLAROID = { width: 1039, card: { width: 138, height: 190 } };
 
 function build(base, columns, rows, cardGap, cardPad) {
