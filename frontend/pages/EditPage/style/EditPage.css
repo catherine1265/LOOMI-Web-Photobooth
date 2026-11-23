@@ -932,3 +932,109 @@
     min-height: 420px;
   }
 }
+/* ============ UNLOCK POPUP ============ */
+.edit-unlock {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(60, 60, 60, 0.55);
+}
+
+.edit-unlock__dialog {
+  width: min(400px, 100%);
+  box-sizing: border-box;
+  padding: 28px 28px 24px;
+
+  border: 1px solid var(--pt-burgundy);
+  border-radius: 22px;
+  background: var(--pt-cream);
+  color: var(--pt-burgundy);
+  box-shadow: 0 3px 8px rgba(70, 36, 30, 0.25);
+  text-align: center;
+}
+
+.edit-unlock__title {
+  margin: 0 0 6px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.edit-unlock__desc {
+  margin: 0 0 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+}
+
+.edit-unlock__input {
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.edit-unlock__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.edit-unlock__input--shake {
+  animation: edit-unlock-shake 0.35s ease;
+}
+
+.edit-unlock__message {
+  min-height: 20px;
+  margin: 8px 0 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pt-burgundy);
+}
+
+.edit-unlock__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.edit-unlock__button {
+  flex: 1;
+  height: 40px;
+
+  border: 1px solid var(--pt-burgundy);
+  border-radius: 999px;
+  background: var(--pt-yellow);
+  color: var(--pt-burgundy);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+
+  cursor: pointer;
+}
+
+.edit-unlock__button--primary {
+  background: var(--pt-pink);
+}
+
+.edit-unlock__button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@keyframes edit-unlock-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edit-unlock__input--shake { animation: none; }
+}

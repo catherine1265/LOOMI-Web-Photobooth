@@ -225,6 +225,7 @@ export default function StripCanvas({
               />
             ))}
             {watermarkFontReady &&
+              edits.showWatermark &&
               watermark.map((line) => (
                 <KonvaText
                   key={line.text}

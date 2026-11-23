@@ -13,9 +13,11 @@ import {
 } from "./editorData.js";
 import StripCanvas from "./components/StripCanvas.jsx";
 import EditorPanel from "./components/EditorPanel.jsx";
+import UnlockPopup from "./components/UnlockPopup.jsx";
+import { isWatermarkUnlocked, rememberWatermarkUnlocked } from "../../config/unlock.js";
 import { setResultPhoto } from "../ResultPhoto/ResultPhoto.js";
 
-const INITIAL_EDITS = { effectId: "original", background: null, stickers: [], texts: [] };
+const INITIAL_EDITS = { effectId: "original", background: null, stickers: [], texts: [], showWatermark: true };
 
 function newId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -25,7 +27,8 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
   const session = usePhotoSession();
   const stageRef = useRef(null);
   const transformerRef = useRef(null);
-  const [edits, setEdits] = useState(INITIAL_EDITS);
+  const [edits, setEdits] = useState(() => ({ ...INITIAL_EDITS, showWatermark: !isWatermarkUnlocked() }));
+  const [unlockOpen, setUnlockOpen] = useState(() => !isWatermarkUnlocked());
   const [selectedId, setSelectedId] = useState(null);
   const [tab, setTab] = useState("effect");
   const [draft, setDraft] = useState("");
@@ -162,6 +165,12 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
     else setDraftColor(color);
   }
 
+  function handleUnlock() {
+    rememberWatermarkUnlocked();
+    patch({ showWatermark: false });
+    setUnlockOpen(false);
+  }
+
   function handleTrash() {
     if (selected) {
       removeItem(selected.id);
@@ -272,6 +281,8 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
           {exportReady ? "DONE" : "Loading photos…"}
         </button>
       </footer>
+
+      {unlockOpen && <UnlockPopup onUnlock={handleUnlock} onSkip={() => setUnlockOpen(false)} />}
     </main>
   );
 }
