@@ -475,33 +475,35 @@ export default function SelfPhoto({ onBack, onDone, frameType }) {
               />
             )}
 
-            <button
-              type="button"
-              className="self-photo-retake"
-              onClick={retakePhoto}
-              aria-label="Retake photo"
-              title="Retake photo"
-            >
-              <RetakeIcon />
-            </button>
-
-            <button
-              type="button"
-              className="self-photo-done"
-              onClick={handleDone}
-            >
-              DONE
-            </button>
-
-            {onBack && (
+            <div className="self-photo-panel-actions">
               <button
                 type="button"
-                className="self-photo-back"
-                onClick={onBack}
+                className="self-photo-retake"
+                onClick={retakePhoto}
+                aria-label="Retake photo"
+                title="Retake photo"
               >
-                Back
+                <RetakeIcon />
               </button>
-            )}
+
+              <button
+                type="button"
+                className="self-photo-done"
+                onClick={handleDone}
+              >
+                DONE
+              </button>
+
+              {onBack && (
+                <button
+                  type="button"
+                  className="self-photo-back"
+                  onClick={onBack}
+                >
+                  Back
+                </button>
+              )}
+            </div>
           </PhotoStripPanel>
         </div>
 

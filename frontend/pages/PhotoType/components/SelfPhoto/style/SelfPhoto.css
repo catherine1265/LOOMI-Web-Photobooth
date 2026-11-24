@@ -5,13 +5,16 @@
   --self-blue: #cbdce5;
   --results-pad-y: clamp(14px, 3vh, 32px);
   --camera-h: max(220px, min(calc(100dvh - 390px), 560px));
+  --panel-actions-h: 112px;
   --results-avail: calc(
     100dvh - 61px - clamp(24px, 6vh, 64px) - clamp(16px, 3vh, 40px) -
-      2 * var(--results-pad-y) - 40px
+      2 * var(--results-pad-y) - 40px - var(--panel-actions-h)
   );
 
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   color: var(--self-burgundy);
@@ -40,7 +43,7 @@
       #fff8e9 100%
     );
 
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Main layout */
@@ -68,7 +71,7 @@
   display: grid;
   grid-template-columns: minmax(0, 740px) 280px;
   grid-template-rows: minmax(0, 1fr);
-  column-gap: 160px;
+  column-gap: clamp(40px, 8vw, 160px);
   align-items: stretch;
 }
 
@@ -195,6 +198,8 @@
 }
 
 .self-photo-countdown button {
+  min-width: 44px;
+  min-height: 44px;
   margin-top: 6px;
   padding: 3px 16px;
 
@@ -213,8 +218,19 @@
   pointer-events: auto;
 }
 
-.self-photo-countdown button:hover {
+.self-photo-countdown button:active {
   background: #f8e9a8;
+}
+
+@media (hover: hover) {
+  .self-photo-countdown button:hover {
+    background: #f8e9a8;
+  }
+}
+
+.self-photo-camera-message button {
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .self-photo-flash {
@@ -244,8 +260,8 @@
 
 /* Camera shutter */
 .self-photo-shutter {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   flex: none;
   margin-top: 9px;
   padding: 14px;
@@ -270,8 +286,14 @@
   height: 100%;
 }
 
-.self-photo-shutter:hover:not(:disabled) {
+.self-photo-shutter:active:not(:disabled) {
   background: #f8e9a8;
+}
+
+@media (hover: hover) {
+  .self-photo-shutter:hover:not(:disabled) {
+    background: #f8e9a8;
+  }
 }
 
 .self-photo-shutter:disabled {
@@ -321,6 +343,7 @@
 .self-photo-actions {
   width: 100%;
   height: 48px;
+  min-height: 44px;
   flex: none;
   margin-top: clamp(10px, 2vh, 20px);
   box-sizing: border-box;
@@ -365,8 +388,14 @@
   background: #f8e9a8;
 }
 
-.self-photo-action:hover:not(:disabled) {
+.self-photo-action:active:not(:disabled) {
   background: #f8e9a8;
+}
+
+@media (hover: hover) {
+  .self-photo-action:hover:not(:disabled) {
+    background: #f8e9a8;
+  }
 }
 
 .self-photo-action:disabled {
@@ -572,6 +601,7 @@
   padding: 8px 10px;
 
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -602,9 +632,9 @@
 }
 
 .self-photo-pose__icon-button {
-  width: 26px;
-  height: 26px;
-  padding: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 12px;
 
   border: 1px solid var(--self-burgundy);
   border-radius: 50%;
@@ -621,8 +651,9 @@
 }
 
 .self-photo-pose__action {
-  height: 26px;
-  padding: 0 12px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 14px;
 
   border: 1px solid var(--self-burgundy);
   border-radius: 999px;
@@ -653,7 +684,7 @@
   overflow-y: auto;
 
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   grid-auto-rows: 72px;
   gap: 8px;
 }
@@ -674,9 +705,16 @@
     box-shadow 180ms ease;
 }
 
-.self-photo-pose__item:hover {
+.self-photo-pose__item:active {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(70, 36, 30, 0.25);
+}
+
+@media (hover: hover) {
+  .self-photo-pose__item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(70, 36, 30, 0.25);
+  }
 }
 
 .self-photo-pose__item[aria-pressed="true"] {
@@ -724,15 +762,23 @@
   outline-offset: 2px;
 }
 
-/* Retake button */
-.self-photo-retake {
-  position: absolute;
-  top: 26px;
-  left: calc(100% + 54px);
+/* Retake, Done and Back sit under the strip, inside the panel */
+.self-photo-panel-actions {
+  flex: none;
+  margin-top: 12px;
 
-  width: 85px;
-  height: 85px;
-  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 10px;
+}
+
+.self-photo-retake {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 9px;
   box-sizing: border-box;
 
   display: flex;
@@ -755,19 +801,23 @@
   height: 100%;
 }
 
-.self-photo-retake:hover {
+.self-photo-retake:active {
   transform: rotate(-15deg);
   background: #e0ebed;
 }
 
-/* Done button */
-.self-photo-done {
-  position: absolute;
-  right: -175px;
-  bottom: 0;
+@media (hover: hover) {
+  .self-photo-retake:hover {
+    transform: rotate(-15deg);
+    background: #e0ebed;
+  }
+}
 
-  min-width: 145px;
+.self-photo-done {
+  min-width: 100px;
+  min-height: 44px;
   height: 46px;
+  flex: 1 1 100px;
   padding: 8px 20px;
 
   border: 1px solid #a98484;
@@ -783,16 +833,19 @@
   cursor: pointer;
 }
 
-.self-photo-done:hover {
+.self-photo-done:active {
   background: #f8e9a8;
 }
 
-/* Back button */
-.self-photo-back {
-  position: absolute;
-  right: -160px;
-  bottom: -43px;
+@media (hover: hover) {
+  .self-photo-done:hover {
+    background: #f8e9a8;
+  }
+}
 
+.self-photo-back {
+  width: 100%;
+  min-height: 44px;
   padding: 7px 10px;
 
   border: none;
@@ -802,6 +855,10 @@
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14px;
   cursor: pointer;
+}
+
+.self-photo-back:active {
+  text-decoration: underline;
 }
 
 .self-photo-error,
@@ -839,13 +896,13 @@
 /* Tablet */
 @media (max-width: 1100px) {
   .self-photo-layout {
-    padding: 48px 28px 35px;
+    padding: 36px 28px 28px;
   }
 
   .self-photo-stage {
     max-width: 100%;
-    grid-template-columns: minmax(0, 1fr) 190px;
-    column-gap: 100px;
+    grid-template-columns: minmax(0, 1fr) clamp(190px, 26vw, 240px);
+    column-gap: clamp(20px, 3vw, 40px);
   }
 
   .self-photo-camera-card {
@@ -854,27 +911,8 @@
   }
 
   .self-photo-results {
-    width: 190px;
+    width: 100%;
     padding: 25px 13px;
-  }
-
-  .self-photo-retake {
-    top: 12px;
-    left: calc(100% + 22px);
-    width: 65px;
-    height: 65px;
-    padding: 12px;
-  }
-
-  .self-photo-done {
-    right: -110px;
-    min-width: 100px;
-    height: 38px;
-    font-size: 13px;
-  }
-
-  .self-photo-back {
-    right: -100px;
   }
 
   .self-photo__sparkle--camera,
@@ -890,12 +928,6 @@
 
 /* Mobile */
 @media (max-width: 650px) {
-  .self-photo-page {
-    height: auto;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
   .self-photo-layout {
     padding: 30px 18px 35px;
   }
@@ -917,13 +949,13 @@
   }
 
   .self-photo-shutter {
-    width: 48px;
-    height: 48px;
-    padding: 12px;
+    width: 56px;
+    height: 56px;
+    padding: 14px;
   }
 
   .self-photo-actions {
-    height: 42px;
+    height: 44px;
     margin-top: 15px;
   }
 
@@ -945,28 +977,8 @@
     max-width: 200px;
   }
 
-  .self-photo-retake {
-    top: -56px;
-    left: auto;
-    right: 0;
-    width: 42px;
-    height: 42px;
-    padding: 8px;
-  }
-
-  .self-photo-done {
-    position: static;
-    display: block;
-    min-width: 105px;
-    height: 36px;
-    margin: 15px 0 0 auto;
-    font-size: 13px;
-  }
-
-  .self-photo-back {
-    position: static;
-    display: block;
-    margin: 8px 0 0 auto;
+  .self-photo-panel-actions {
+    margin-top: 14px;
   }
 
   .self-photo__sparkle--camera {

@@ -3,11 +3,13 @@
   --pt-cream: #fff5cb;
   --pt-blue: #cbdce5;
 
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
   color: var(--pt-burgundy);
   background-color: #fffdf8;
 
@@ -49,7 +51,7 @@
 
 .upload-photo__frame {
   --frame-ratio: calc(103 / 270);
-  --frame-h: min(calc(100dvh - 300px), 640px);
+  --frame-h: max(280px, min(calc(100dvh - 300px), 640px));
   --frame-w: calc(var(--frame-h) * var(--frame-ratio));
 
   flex: none;
@@ -95,8 +97,14 @@
   cursor: pointer;
 }
 
-.upload-photo__slot:hover {
+.upload-photo__slot:active {
   background: #c5c5c0;
+}
+
+@media (hover: hover) {
+  .upload-photo__slot:hover {
+    background: #c5c5c0;
+  }
 }
 
 .upload-photo__slot img {
@@ -109,11 +117,14 @@
 .upload-photo__actions {
   flex: none;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 16px;
 }
 
 .upload-photo__button {
   min-width: 150px;
+  min-height: 44px;
   height: 46px;
   padding: 8px 22px;
 
@@ -130,8 +141,14 @@
   cursor: pointer;
 }
 
-.upload-photo__button:hover:not(:disabled) {
+.upload-photo__button:active:not(:disabled) {
   background: #f8e9a8;
+}
+
+@media (hover: hover) {
+  .upload-photo__button:hover:not(:disabled) {
+    background: #f8e9a8;
+  }
 }
 
 .upload-photo__button--primary {
@@ -141,8 +158,14 @@
   letter-spacing: 1.6px;
 }
 
-.upload-photo__button--primary:hover:not(:disabled) {
+.upload-photo__button--primary:active:not(:disabled) {
   background: #7a302b;
+}
+
+@media (hover: hover) {
+  .upload-photo__button--primary:hover:not(:disabled) {
+    background: #7a302b;
+  }
 }
 
 .upload-photo__button:disabled {
@@ -162,6 +185,8 @@
 }
 
 .upload-photo__back {
+  min-width: 44px;
+  min-height: 44px;
   flex: none;
   padding: 6px 10px;
 
@@ -175,9 +200,16 @@
   cursor: pointer;
 }
 
-.upload-photo__back:hover {
+.upload-photo__back:active {
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+@media (hover: hover) {
+  .upload-photo__back:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
 }
 
 .upload-photo-page button:focus-visible {
@@ -187,8 +219,6 @@
 
 @media (max-width: 650px) {
   .upload-photo-page {
-    height: auto;
-    min-height: 100vh;
   }
 
   .upload-photo__frame {

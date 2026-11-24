@@ -465,7 +465,6 @@
   flex: none;
 
   height: calc(330 * var(--u));
-  aspect-ratio: 591 / 1772;
 
   border: calc(1 * var(--u)) solid #95665f;
   border-radius: calc(4 * var(--u));

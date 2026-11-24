@@ -6,11 +6,13 @@
   --pt-pink: #fadde4;
   --pt-paper: #fff8ec;
 
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
   color: var(--pt-burgundy);
   background-color: #fffdf8;
 
@@ -194,7 +196,7 @@
 .edit-panel__tab {
   flex: 1;
   max-width: 118px;
-  height: 36px;
+  height: 44px;
 
   border: 1px solid var(--pt-burgundy);
   border-radius: 999px;
@@ -222,7 +224,8 @@
 }
 
 .edit-tab__upload {
-  height: 38px;
+  min-height: 44px;
+  height: 44px;
   padding: 0 22px;
 
   border: 1px solid var(--pt-burgundy);
@@ -383,7 +386,8 @@
 
 .edit-frames__back {
   width: 32px;
-  height: 32px;
+  min-height: 44px;
+  height: 44px;
   padding: 6px;
 
   border: 1px solid var(--pt-burgundy);
@@ -620,7 +624,8 @@
 
 .edit-color__eyedropper {
   width: 32px;
-  height: 32px;
+  min-height: 44px;
+  height: 44px;
   padding: 6px;
   box-sizing: border-box;
 
@@ -842,7 +847,7 @@
 
 .edit-page__footer {
   flex: none;
-  padding: 0 4% clamp(12px, 3vh, 32px);
+  padding: 0 4% calc(clamp(12px, 3vh, 32px) + env(safe-area-inset-bottom));
 
   display: flex;
   align-items: center;
@@ -886,7 +891,7 @@
 
 .edit-page__done {
   min-width: 112px;
-  height: 36px;
+  height: 44px;
   padding: 0 24px;
 
   border: 1px solid var(--pt-burgundy);
@@ -902,9 +907,16 @@
   cursor: pointer;
 }
 
-.edit-page__done:hover,
-.edit-page__trash:hover {
+.edit-page__done:active,
+.edit-page__trash:active {
   background: var(--pt-cream);
+}
+
+@media (hover: hover) {
+  .edit-page__done:hover,
+  .edit-page__trash:hover {
+    background: var(--pt-cream);
+  }
 }
 
 .edit-page button:focus-visible,
@@ -915,8 +927,6 @@
 
 @media (max-width: 900px) {
   .edit-page {
-    height: auto;
-    min-height: 100vh;
     overflow-x: hidden;
   }
 
@@ -937,17 +947,19 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  padding: 16px;
+  box-sizing: border-box;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 
   display: flex;
-  align-items: center;
-  justify-content: center;
 
   background: rgba(60, 60, 60, 0.55);
 }
 
 .edit-unlock__dialog {
   width: min(400px, 100%);
+  margin: auto;
   box-sizing: border-box;
   padding: 28px 28px 24px;
 
@@ -1003,7 +1015,8 @@
 
 .edit-unlock__button {
   flex: 1;
-  height: 40px;
+  min-width: 44px;
+  height: 44px;
 
   border: 1px solid var(--pt-burgundy);
   border-radius: 999px;

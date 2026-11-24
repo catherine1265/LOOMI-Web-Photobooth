@@ -3,6 +3,7 @@ import "./style/EditPage.css";
 import Navbar from "../Navbar/tampilan/Navbar";
 import { clearPhotoSession, usePhotoSession } from "../../photoStore.js";
 import { printSpec } from "../../printSpec.js";
+import { exportStripPng, isStripFrame, logExportSize } from "../../printExport.js";
 import { loadImage } from "../../stripAssets.js";
 import {
   DEFAULT_FONT_ID,
@@ -14,7 +15,7 @@ import {
 import StripCanvas from "./components/StripCanvas.jsx";
 import EditorPanel from "./components/EditorPanel.jsx";
 import UnlockPopup from "./components/UnlockPopup.jsx";
-import { isWatermarkUnlocked, rememberWatermarkUnlocked } from "../../config/unlock.js";
+import { isWatermarkUnlocked, rememberWatermarkUnlocked, resetWatermarkUnlocked } from "../../config/unlock.js";
 import { setResultPhoto } from "../ResultPhoto/ResultPhoto.js";
 
 const INITIAL_EDITS = { effectId: "original", background: null, stickers: [], texts: [], showWatermark: true };
@@ -177,12 +178,14 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
       return;
     }
 
+    resetWatermarkUnlocked();
+
     const frameType = session.frameType;
     if (session.source !== "collab") clearPhotoSession();
     onRetake(frameType);
   }
 
-  function handleDone() {
+  async function handleDone() {
     const stage = stageRef.current;
     const transformer = transformerRef.current;
 
@@ -192,24 +195,32 @@ export default function EditPage({ onEmpty, onRetake , onDone}) {
     }
 
     const previousNodes = transformer?.nodes() ?? [];
+    const strip = isStripFrame(session.frameType);
+    let exported;
 
     try {
       transformer?.nodes([]);
 
-      const url = stage.toDataURL({
-        pixelRatio: spec.width / stage.width(),
-        mimeType: "image/png",
-      });
-
-      setResultPhoto(url);
-      onDone?.();
+      const config = { pixelRatio: spec.width / stage.width(), mimeType: "image/png" };
+      exported = strip ? stage.toCanvas(config) : stage.toDataURL(config);
     } catch (exportError) {
       setError(exportError.message || "Unable to save your photo.");
+      return;
     } finally {
       if (transformer) {
         transformer.nodes(previousNodes);
         transformer.getLayer()?.batchDraw();
       }
+    }
+
+    try {
+      const url = strip ? await exportStripPng(exported, session.frameType) : exported;
+      if (!strip) await logExportSize(session.frameType, url);
+
+      setResultPhoto(url);
+      onDone?.();
+    } catch (exportError) {
+      setError(exportError.message || "Unable to save your photo.");
     }
   }
 

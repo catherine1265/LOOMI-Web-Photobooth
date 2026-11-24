@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { resetWatermarkUnlocked } from "./config/unlock.js";
 
 const STORAGE_KEY = "loomi.photoSession";
 const JPEG_QUALITY = 0.92;
@@ -87,5 +88,6 @@ export async function saveSoloSession(frameType, sources) {
     })
   );
 
+  resetWatermarkUnlocked();
   setPhotoSession({ source: "solo", frameType, photos });
 }

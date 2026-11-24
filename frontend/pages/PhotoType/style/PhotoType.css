@@ -4,11 +4,13 @@
   --pt-cream: #fff5cb;
   --pt-blue: rgba(202, 220, 230, 0.88);
 
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
   color: var(--pt-burgundy);
   background-color: #f7f5ef;
 
@@ -222,15 +224,30 @@
 }
 
 /* Hover effects */
-.photo-type__option:hover .photo-type__icon {
+.photo-type__option:active .photo-type__icon {
   transform: translateY(-4px);
   box-shadow: 0 7px 12px rgba(70, 36, 30, 0.2);
   background-color: #fff8d8;
 }
 
-.photo-type__option:hover .photo-type__label {
+@media (hover: hover) {
+  .photo-type__option:hover .photo-type__icon {
+    transform: translateY(-4px);
+    box-shadow: 0 7px 12px rgba(70, 36, 30, 0.2);
+    background-color: #fff8d8;
+  }
+}
+
+.photo-type__option:active .photo-type__label {
   transform: translateY(-2px);
   background-color: #7a302b;
+}
+
+@media (hover: hover) {
+  .photo-type__option:hover .photo-type__label {
+    transform: translateY(-2px);
+    background-color: #7a302b;
+  }
 }
 
 /* Keyboard focus */
@@ -294,8 +311,6 @@
 /* Mobile */
 @media (max-width: 520px) {
   .photo-type-page {
-    height: auto;
-    min-height: 100vh;
   }
 
   .photo-type {
@@ -358,6 +373,8 @@
 }
 
 .photo-type__back {
+  min-width: 44px;
+  min-height: 44px;
   margin-top: clamp(8px, 2vh, 24px);
   padding: 8px 12px;
 
@@ -372,9 +389,16 @@
   cursor: pointer;
 }
 
-.photo-type__back:hover {
+.photo-type__back:active {
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+@media (hover: hover) {
+  .photo-type__back:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
 }
 
 .photo-type__back:focus-visible {
